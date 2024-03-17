@@ -348,66 +348,73 @@ struct ContentView_Array: View {
   }
 }
 
-
+// 1.  @State変数によってViewの状態を決める。
+// 2. Animationを起こす。
+//    withAnimation と animation modifierによる方法がある
 struct RippleCircleExplicit: View {
   @Binding var isShow: Bool
-  @State var active: Bool = false
-  @State private var isAnimating = false
+  @State var isExpanded: Bool = false
   var color: Color
   var offsetDiff: Double
-  var duration: Double
-  private let animationDelay: Double = 0.1
+  var duration: Double = 1.0
+  @State var isRepeating = false
+  var animationDelay: Double = 0.1
 
   var body: some View {
-    VStack{
+    VStack {
       ZStack {
         Circle()
           .stroke(color, lineWidth: 2.0)
-          .scaleEffect(isAnimating ? 2:0 )
-          .opacity(isAnimating ? 0 : 1)
-          .animation(
-            active ?
-            .easeIn
-              .repeatForever(autoreverses: false)
-            : nil
-            ,value: isAnimating
-          )
-          .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/)
+          .scaleEffect(isExpanded ? 2 : 0)
+          .opacity(isExpanded ? 0 : 1)
+          
+      }
 
-      }
-      
-      Text("isShow = \(isShow)")
-      Text("active = \(active)")
-      Text("isAnimating = \(isAnimating)")
-      
-      Button(action: {
-        active.toggle()
-      }) {
-        Text("active")
-          .font(.caption2)
-          .foregroundColor(.white)
-          .padding()
-          .background(isShow ? Color.red : Color.blue)
-          .cornerRadius(10)
-      }
+//      Text("isExpanded = \(isExpanded)")
     }
-    
+    .onChange(of: isShow) {
+      print("onChange isShow=\(isShow)")
+      repeatAnimation()
+    }
     .onAppear {
-      isAnimating = true
+      print("onAppear isShow=\(isShow)")
+      repeatAnimation()
     }
   }
-}
 
+  func repeatAnimation() {
+    if isRepeating {
+      print("repeatAnimation isRepeating=\(isRepeating) exit")
+      return
+    }
+    print("repeatAnimation isShow=\(isShow)")
+    isRepeating = true
+
+    withAnimation(.easeIn(duration: duration).delay(animationDelay)) {
+      isExpanded = true
+    }
+    // 上記のアニメーションを無限に繰り返す
+    DispatchQueue.main.asyncAfter(deadline: .now() + duration + animationDelay  ) {
+      isRepeating = false
+      isExpanded = false
+      if isShow {
+        repeatAnimation()
+      }
+    }
+
+  }
+}
 
 struct ContentView: View {
   @State var isShow = true
   var body: some View {
     VStack {
-      RippleCircleExplicit(isShow: $isShow, color: Color.blue, offsetDiff: 10, duration: 1)
-        .frame(width: 200)
-        .padding(10)
-
-     
+      ZStack{
+        ForEach(0..<30, id: \.self) { index in
+          RippleCircleExplicit(isShow: $isShow, color: Color.blue, offsetDiff: 10, duration: 2,animationDelay:Double(index) * 0.1)
+            .frame(width: 200)
+        }
+      }
       Button(action: {
         isShow.toggle()
       }) {
@@ -418,7 +425,8 @@ struct ContentView: View {
           .background(isShow ? Color.red : Color.blue)
           .cornerRadius(10)
       }
-      
+      .padding(.top, 50 )
+
       Text("isShow = \(isShow)")
     }
     .padding()
