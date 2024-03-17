@@ -158,7 +158,7 @@ struct RippleCircle_v1: View {
   }
 }
 
-struct RippleCircles: View {
+struct RippleCircles_v1: View {
   @State private var isAnimating = false
   var circleCount: Int
   var colors: [Color]
@@ -410,27 +410,116 @@ struct RippleCircleExplicitTimer: View {
   }
 }
 
-struct ContentView: View {
-  @State var isShow = true
+struct RippleCircles: View {
+  @Binding var isShow: Bool
+  var number: Int
+  var startColor: Color
+  var endColor: Color
+  var duration: Double
+  var delay: Double
+  var offsetDiff: Double
+
+  let colors: [Color]
+
+  @State var isExpandeds: [Bool]
+  @State var isRepeating = false
+
+  init(isShow: Binding<Bool>, number: Int, startColor: Color, endColor: Color, duration: Double, delay: Double, offsetDiff: Double) {
+    self._isShow = isShow
+    self.number = number
+    self.startColor = startColor
+    self.endColor = endColor
+    self.duration = duration
+    self.delay = delay
+    self.offsetDiff = offsetDiff
+    self.colors = generateGradientColors(startColor: startColor, endColor: endColor, numberOfColors: number)
+    self.isExpandeds = Array(repeating: false, count: number)
+  }
+
   var body: some View {
     VStack {
       ZStack {
-        ForEach(0..<5, id: \.self) { index in
-          RippleCircleExplicit(isShow: $isShow, color: Color.blue, offsetDiff: 10, duration: 2, animationDelay: Double(index) * 0.1)
-            .frame(width: 200)
+        ForEach(0..<isExpandeds.count, id: \.self) { index in
+          Circle()
+            .offset(CGSize(width: Double.random(in: -offsetDiff...offsetDiff),
+                           height: Double.random(in: -offsetDiff...offsetDiff)))
+            //                    .stroke(Color.blue, lineWidth: 1)
+            .stroke(colors[index % colors.count], lineWidth: Double.random(in: 1.0...5.0))
+            .scaleEffect(isExpandeds[index] ? 1 : 0)
+            .opacity(isExpandeds[index] ? 0 : 1)
         }
       }
-      Button(action: {
-        isShow.toggle()
-      }) {
-        Text("ボタン")
-          .font(.caption2)
-          .foregroundColor(.white)
-          .padding()
-          .background(isShow ? Color.red : Color.blue)
-          .cornerRadius(10)
+
+//      Text("isExpanded = \(isExpanded)")
+    }
+    .onChange(of: isShow) {
+      print("onChange isShow=\(isShow)")
+      repeatAnimation()
+    }
+    .onAppear {
+      print("onAppear isShow=\(isShow)")
+      repeatAnimation()
+    }
+  }
+
+  func repeatAnimation() {
+    if isRepeating {
+      print("repeatAnimation isRepeating=\(isRepeating) exit")
+      return
+    }
+    print("repeatAnimation isShow=\(isShow)")
+    isRepeating = true
+
+    for i in 0..<isExpandeds.count {
+      withAnimation(.easeIn(duration: duration).delay(delay * Double(i))) {
+        isExpandeds[i] = true
       }
-      .padding(.top, 50)
+    }
+
+    // 上記のアニメーションを無限に繰り返す
+    DispatchQueue.main.asyncAfter(deadline: .now() + duration + Double(isExpandeds.count - 1) * delay) {
+      isRepeating = false
+      isExpandeds = Array(repeating: false, count: isExpandeds.count)
+      if isShow {
+        repeatAnimation()
+      }
+    }
+//    Timer.scheduledTimer(withTimeInterval: duration + animationDelay, repeats: false) { _ in
+//      isRepeating = false
+//      isExpanded = false
+//      if isShow {
+//        repeatAnimation()
+//      }
+//    }
+  }
+}
+
+struct ContentView: View {
+  @State var isShow = true
+  let color = Color(#colorLiteral(red: 0, green: 0.6230022509, blue: 1, alpha: 0.8020036139))
+  let startColor = Color(#colorLiteral(red: 0, green: 0.6230022509, blue: 1, alpha: 0.8020036139))
+  let endColor = Color(#colorLiteral(red: 0.05724914705, green: 0, blue: 1, alpha: 0.7992931548))
+
+  var body: some View {
+    VStack {
+      ZStack {
+        RippleCircles(isShow: $isShow, number: 10, startColor: startColor, endColor: endColor, duration: 3, delay: 0.3, offsetDiff: 20)
+          .frame(width: 300)
+          .border(Color.green)
+        Button(action: {
+          isShow.toggle()
+        }) {
+          Text(isShow ? "Stop" : "Start")
+
+//            .font(.caption2)
+            .foregroundColor(.white)
+            .frame(width: 80, height: 80)
+//            .padding()
+            .background(isShow ? Color.red : Color.blue)
+            .cornerRadius(40)
+        }
+//      .padding(.top, 50)
+      }
 
       Text("isShow = \(isShow)")
     }
