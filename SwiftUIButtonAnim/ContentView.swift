@@ -410,7 +410,7 @@ struct ContentView: View {
   var body: some View {
     VStack {
       ZStack{
-        ForEach(0..<30, id: \.self) { index in
+        ForEach(0..<5, id: \.self) { index in
           RippleCircleExplicit(isShow: $isShow, color: Color.blue, offsetDiff: 10, duration: 2,animationDelay:Double(index) * 0.1)
             .frame(width: 200)
         }
