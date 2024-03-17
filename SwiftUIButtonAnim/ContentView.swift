@@ -5,17 +5,15 @@
 
 import SwiftUI
 
-
 extension Animation {
-    func `repeat`(while expression: Bool, autoreverses: Bool = true) -> Animation {
-        if expression {
-            return self.repeatForever(autoreverses: autoreverses)
-        } else {
-            return self
-        }
+  func `repeat`(while expression: Bool, autoreverses: Bool = true) -> Animation {
+    if expression {
+      return self.repeatForever(autoreverses: autoreverses)
+    } else {
+      return self
     }
+  }
 }
-
 
 struct RippleButton2: View {
   @State private var rippleOpacity: Double = 1.0
@@ -198,7 +196,7 @@ struct RippleCircles: View {
 
 struct RippleCircle: View {
   @State private var isAnimating = false
-  var id:UInt64
+  var id: UInt64
   var color: Color
   var offsetDiff: Double
   var duration: Double
@@ -267,39 +265,38 @@ func generateGradientColors(startColor: Color, endColor: Color, numberOfColors: 
 }
 
 func tickCount() -> UInt64 {
-    return DispatchTime.now().uptimeNanoseconds / 1_000_000
+  return DispatchTime.now().uptimeNanoseconds / 1000000
 }
 
-struct RippleObject:Identifiable {
-  var id:UInt64
-  var tick:UInt64
-  var delay:UInt64
+struct RippleObject: Identifiable {
+  var id: UInt64
+  var tick: UInt64
+  var delay: UInt64
 }
-  
-struct ContentView: View {
-  @State private var rippleId:UInt64 = 0
+
+struct ContentView_Array: View {
+  @State private var rippleId: UInt64 = 0
   @State private var isRippleShow = false
-  @State private var ripples:[RippleObject] = []
-  @State private var tick:UInt64 = tickCount()
+  @State private var ripples: [RippleObject] = []
+  @State private var tick: UInt64 = tickCount()
   let startColor = Color(#colorLiteral(red: 0, green: 0.6230022509, blue: 1, alpha: 0.8020036139))
   let endColor = Color(#colorLiteral(red: 0.05724914705, green: 0, blue: 1, alpha: 0.7992931548))
   let objnum = 10 + Int.random(in: 0...3)
-  let duration:UInt64 = 1500
-  let delay:UInt64 = 100
+  let duration: UInt64 = 1500
+  let delay: UInt64 = 100
   var colors: [Color]
-  
+
   init() {
     colors = generateGradientColors(startColor: startColor, endColor: endColor, numberOfColors: objnum)
   }
 
-  
   var body: some View {
     ZStack {
       ForEach(ripples) { ripple in
 //        let _ = print(Double(ripples[index] - tick)/1000 )
-        let _ = print("ripple[\(ripple.id)]=\(ripple.tick)" )
+        let _ = print("ripple[\(ripple.id)]=\(ripple.tick)")
         if ripple.tick > tick {
-          RippleCircle(id:ripple.id, color: Color.blue, offsetDiff: 10, duration: Double(duration/1000) ,delay:Double(ripple.delay)/1000)
+          RippleCircle(id: ripple.id, color: Color.blue, offsetDiff: 10, duration: Double(duration / 1000), delay: Double(ripple.delay) / 1000)
             .frame(width: 50)
         }
 //        Circle()
@@ -307,26 +304,25 @@ struct ContentView: View {
 //          .frame(width: 100)
 //          .offset(x:CGFloat(index*2),y:CGFloat(index*2))
       }
-      
-      
+
       if isRippleShow {
 //        RippleCircles(circleCount: objnum, colors: colors, offsetDiff: 1, duration: duration)
 //          .frame(width: 50)
       }
-      VStack{
+      VStack {
         Button(action: {
           // ボタンがタップされた時の処理
-          
+
           tick = tickCount()
-          ripples = ripples.filter{ $0.tick > tick - delay}
+          ripples = ripples.filter { $0.tick > tick - delay }
 //          print("ripples(b)= \(ripples)")
-          
+
           for i in 0..<10 {
             self.rippleId += 1
-            ripples.append(  RippleObject(id: rippleId, tick: tick + delay * UInt64(i),delay:delay * UInt64(i)))
+            ripples.append(RippleObject(id: rippleId, tick: tick + delay * UInt64(i), delay: delay * UInt64(i)))
           }
 //          print("newRipples(a)= \(newRipples)")
-          
+
 //          ripples = newRipples
           print("ripples(a)= \(ripples)")
 
@@ -342,13 +338,88 @@ struct ContentView: View {
             .background(Color.blue)
             .cornerRadius(10)
         }
-        
+
         Text("\(ripples.count)")
         Text("tick=\(tick)")
         Text("rippleId=\(rippleId)")
-        
+      }
+    }
+    .padding()
+  }
+}
+
+
+struct RippleCircleExplicit: View {
+  @Binding var isShow: Bool
+  @State var active: Bool = false
+  @State private var isAnimating = false
+  var color: Color
+  var offsetDiff: Double
+  var duration: Double
+  private let animationDelay: Double = 0.1
+
+  var body: some View {
+    VStack{
+      ZStack {
+        Circle()
+          .stroke(color, lineWidth: 2.0)
+          .scaleEffect(isAnimating ? 2:0 )
+          .opacity(isAnimating ? 0 : 1)
+          .animation(
+            active ?
+            .easeIn
+              .repeatForever(autoreverses: false)
+            : nil
+            ,value: isAnimating
+          )
+          .frame(width: /*@START_MENU_TOKEN@*/100/*@END_MENU_TOKEN@*/)
+
       }
       
+      Text("isShow = \(isShow)")
+      Text("active = \(active)")
+      Text("isAnimating = \(isAnimating)")
+      
+      Button(action: {
+        active.toggle()
+      }) {
+        Text("active")
+          .font(.caption2)
+          .foregroundColor(.white)
+          .padding()
+          .background(isShow ? Color.red : Color.blue)
+          .cornerRadius(10)
+      }
+    }
+    
+    .onAppear {
+      isAnimating = true
+    }
+  }
+}
+
+
+struct ContentView: View {
+  @State var isShow = true
+  var body: some View {
+    VStack {
+      RippleCircleExplicit(isShow: $isShow, color: Color.blue, offsetDiff: 10, duration: 1)
+        .frame(width: 200)
+        .padding(10)
+
+     
+      Button(action: {
+        isShow.toggle()
+      }) {
+        Text("ボタン")
+          .font(.caption2)
+          .foregroundColor(.white)
+          .padding()
+          .background(isShow ? Color.red : Color.blue)
+          .cornerRadius(10)
+      }
+      
+      Text("isShow = \(isShow)")
     }
     .padding()
   }
