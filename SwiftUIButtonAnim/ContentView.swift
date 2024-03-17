@@ -351,7 +351,7 @@ struct ContentView_Array: View {
 // 1.  @State変数によってViewの状態を決める。
 // 2. Animationを起こす。
 //    withAnimation と animation modifierによる方法がある
-struct RippleCircleExplicit: View {
+struct RippleCircleExplicitTimer: View {
   @Binding var isShow: Bool
   @State var isExpanded: Bool = false
   var color: Color
@@ -367,7 +367,6 @@ struct RippleCircleExplicit: View {
           .stroke(color, lineWidth: 2.0)
           .scaleEffect(isExpanded ? 2 : 0)
           .opacity(isExpanded ? 0 : 1)
-          
       }
 
 //      Text("isExpanded = \(isExpanded)")
@@ -394,14 +393,20 @@ struct RippleCircleExplicit: View {
       isExpanded = true
     }
     // 上記のアニメーションを無限に繰り返す
-    DispatchQueue.main.asyncAfter(deadline: .now() + duration + animationDelay  ) {
+//    DispatchQueue.main.asyncAfter(deadline: .now() + duration + animationDelay  ) {
+//      isRepeating = false
+//      isExpanded = false
+//      if isShow {
+//        repeatAnimation()
+//      }
+//    }
+    Timer.scheduledTimer(withTimeInterval: duration + animationDelay, repeats: false) { _ in
       isRepeating = false
       isExpanded = false
       if isShow {
         repeatAnimation()
       }
     }
-
   }
 }
 
@@ -409,9 +414,9 @@ struct ContentView: View {
   @State var isShow = true
   var body: some View {
     VStack {
-      ZStack{
+      ZStack {
         ForEach(0..<5, id: \.self) { index in
-          RippleCircleExplicit(isShow: $isShow, color: Color.blue, offsetDiff: 10, duration: 2,animationDelay:Double(index) * 0.1)
+          RippleCircleExplicit(isShow: $isShow, color: Color.blue, offsetDiff: 10, duration: 2, animationDelay: Double(index) * 0.1)
             .frame(width: 200)
         }
       }
@@ -425,7 +430,7 @@ struct ContentView: View {
           .background(isShow ? Color.red : Color.blue)
           .cornerRadius(10)
       }
-      .padding(.top, 50 )
+      .padding(.top, 50)
 
       Text("isShow = \(isShow)")
     }
