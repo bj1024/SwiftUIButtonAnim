@@ -410,6 +410,17 @@ struct RippleCircleExplicitTimer: View {
   }
 }
 
+/**
+  * RippleCircles
+
+  *  - isShow: Binding<Bool>  表示するかどうか
+  *  - number: Int            表示する円の数
+  *  - startColor: Color      最初の色
+  *  - endColor: Color        最後の色
+  *  - duration: Double       アニメーションの時間
+  *  - delay: Double          アニメーションの遅延時間
+  *  - offsetDiff: Double     円の位置のずれ
+  */
 struct RippleCircles: View {
   @Binding var isShow: Bool
   var number: Int
@@ -449,14 +460,10 @@ struct RippleCircles: View {
             .opacity(isExpandeds[index] ? 0 : 1)
         }
       }
-      
-
-//      Text("isExpanded = \(isExpanded)")
     }
     .onChange(of: isShow) { newValue in
       print("onChange isShow=\(newValue)")
       if newValue {
-//        resetAnimPosition()
         repeatAnimation()
       }
       else{
@@ -470,26 +477,19 @@ struct RippleCircles: View {
     }
     .onDisappear {
       print("onDisappear isShow=\(isShow)")
-//      timer?.invalidate()
     }
     .onChange(of: scenePhase) { phase in
       switch phase {
       case .active:
-        print("scenePhase active")
-//        resetAnimPosition()
-//        if isShow {
-//          repeatAnimation()
-//        }
+        break
       case .inactive:
-//        resetAnimPosition()
-//        timer?.invalidate()
         isShow = false
+        break
         
-        print("scenePhase inactive")
       case .background:
-        print("scenePhase background")
+        break
       @unknown default:
-        print("scenePhase @unknown")
+        break
       }
     }
   }
@@ -499,34 +499,25 @@ struct RippleCircles: View {
       print("repeatAnimation reenterd exit")
       return
     }
+    // タイマーでアニメーションを繰り返す
     self.timer = Timer.scheduledTimer(withTimeInterval: duration + Double(isExpandeds.count - 1) * delay, repeats: false) { _ in
       print("repeatAnimation timer")
       self.timer = nil
-//      isRepeating = false
       resetAnimPosition()
-      if isShow {
+      if isShow { // タイマー発生時にも表示中であれば、もう一度アニメーションを開始する
         repeatAnimation()
       }
-      
     }
-    //    print("repeatAnimation isShow=\(isShow)")
-//    isRepeating = true
 
+    // 全ての円をアニメーションON位置にする
     for i in 0..<isExpandeds.count {
+      // withAnimationでアニメーションを行う
+      // withAnimation中に変数を変更すると、その変更もアニメーションされるので注意。
+      // （resetAnimPositionすると円が縮むアニメーションが出てしまう）
       withAnimation(.easeIn(duration: duration).delay(delay * Double(i))) {
         isExpandeds[i] = true
       }
     }
-
-    //    // 上記のアニメーションを無限に繰り返す
-    //    DispatchQueue.main.asyncAfter(deadline: .now() + duration + Double(isExpandeds.count - 1) * delay) {
-    //      isRepeating = false
-    //      isExpandeds = Array(repeating: false, count: isExpandeds.count)
-    //      if isShow {
-    //        repeatAnimation()
-    //      }
-    //    }
-
   }
 
   func resetAnimPosition() {
