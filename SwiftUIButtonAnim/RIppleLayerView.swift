@@ -27,89 +27,155 @@ struct RippleLayerCircles: View {
     self.delay = delay
     self.offsetDiff = offsetDiff
     self.colors = generateGradientColors(startColor: startColor, endColor: endColor, numberOfColors: number)
-      .map { $0.cgColor ?? CGColor.init(red: 0, green: 0, blue: 0, alpha: 0)}
+      .map { $0.cgColor ?? CGColor(red: 0, green: 0, blue: 0, alpha: 0) }
   }
 
   var body: some View {
     ZStack {
-      if isShow {
-        CircleLayerView(number: number, colors: colors, duration: duration, delay: delay, offsetDiff: offsetDiff)
+      GeometryReader { proxy in
+        CircleLayerView(frame: proxy.frame(in: .local), number: number, colors: colors, duration: duration, delay: delay, offsetDiff: offsetDiff)
+          .frame(width: .infinity,height: .infinity)
       }
-    }
-    .onAppear {
-      isAnimating = true
-    }
-    .onDisappear {
-      isAnimating = false
     }
   }
 }
 
+class UIRippleView: UIView {
+  
+  var number:Int = 0
+  var strokeColor: CGColor = UIColor.black.cgColor
+  private var  layers:[CAShapeLayer] =  []
+  
+  override init(frame: CGRect) {
+    print("init frame=\(frame)")
+    super.init(frame: frame)
+    self.frame = frame
+//    self.backgroundColor = UIColor.clear
+//    initLanyer()
+  }
+  
+  required init?(coder aDecoder: NSCoder) {
+    print("init coder")
+    super.init(coder: aDecoder)
+//    initLanyer()
+  }
+
+  func initLanyer() {
+    self.layer.borderWidth = 2
+    self.layer.borderColor = UIColor.red.cgColor
+
+    let duration = 5.0
+   
+    let delaybase = duration / Double(number) * 0.9
+//    let delaybase = 0.1
+    print("initLayer = \(frame)")
+    layers = []
+    for i in 0 ..< number {
+      let layer = addCircleLayer(position: CGPoint(x: 0, y: 0),
+                      size: bounds.size,
+                                  strokeColor: strokeColor,
+                      duration: duration,
+                      delay: delaybase * Double(i))
+      
+      layers.append(layer)
+    }
+  }
+
+  func addCircleLayer(position: CGPoint, size: CGSize,
+                       strokeColor: CGColor, duration: Double, delay: Double)->CAShapeLayer
+  {
+//    print("addCircleLanyer[\(i)]")
+    let circleLayer = CAShapeLayer()
+//    circleLayer.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+    circleLayer.position = position
+
+    let circlePath = UIBezierPath(ovalIn: CGRect(origin: position, size: size))
+    circleLayer.path = circlePath.cgPath
+    circleLayer.strokeColor = strokeColor
+    circleLayer.fillColor = UIColor.clear.cgColor
+    circleLayer.opacity = 0
+
+//        circleLayer.fillColor = UIColor.red.cgColor // 円の色を設定します
+
+    self.layer.addSublayer(circleLayer)
+    
+
+//    let animation = CABasicAnimation(keyPath: "transform.scale")
+//    animation.fromValue = 0
+//    animation.toValue = 1
+//    animation.duration = 3
+    // animation.beginTime = CACurrentMediaTime() + 0.1
+//    animation.timingFunction = CAMediaTimingFunction(name: .easeIn)
+//
+//    let groupAnimation = CAAnimationGroup()
+//    groupAnimation.animations = [animation]
+//    groupAnimation.duration = 3
+//    groupAnimation.repeatCount = .infinity
+//
+//    circleLayer.add(groupAnimation, forKey: "scaleAnimation")
+
+    let animationGroup = CAAnimationGroup()
+    animationGroup.duration = 2.0
+    animationGroup.beginTime = CACurrentMediaTime() + delay
+    animationGroup.fillMode = CAMediaTimingFillMode.forwards
+    animationGroup.repeatCount = .infinity
+    animationGroup.isRemovedOnCompletion = false
+
+    let animation1 = CABasicAnimation(keyPath: "transform.scale")
+    animation1.fromValue = 0
+    animation1.toValue = 1.0
+
+    let animation2 = CABasicAnimation(keyPath: "opacity")
+    animation2.fromValue = 1.0
+    animation2.toValue = 0.0
+
+    let animation3 = CABasicAnimation(keyPath: "position")
+    animation3.fromValue = [bounds.midX, bounds.midY]
+    animation3.toValue = [position.x, position.y]
+//    CGPoint(x: bounds.midX, y: bounds.midY)
+
+//    let animation3 = CABasicAnimation(keyPath: "transform.rotation")
+//    animation3.fromValue = 0.0
+//    animation3.toValue = Double.pi * 2.0
+//    animation3.speed = 1.0
+
+    animationGroup.animations = [animation1, animation2, animation3]
+    circleLayer.add(animationGroup, forKey: nil)
+//    circleLayer.add(animation, forKey: nil)
+    return circleLayer
+  }
+  func update(){
+    print("update = \(frame)")
+    initLanyer()
+  }
+}
+
+
 struct CircleLayerView: UIViewRepresentable {
+  let frame: CGRect
   var number: Int
   var colors: [CGColor]
   var duration: Double
   var delay: Double
   var offsetDiff: Double
 
-  func makeUIView(context: Context) -> UIView {
-    let containerView = UIView()
-    let containerLayer = CALayer()
-    containerView.layer.addSublayer(containerLayer)
-
-    for i in 0..<number {
-      let circleLayer = CAShapeLayer()
-      let diameter = CGFloat.random(in: 30...100)
-      let circlePath = UIBezierPath(ovalIn: CGRect(x: 0, y: 0, width: diameter, height: diameter))
-      circleLayer.path = circlePath.cgPath
-      circleLayer.fillColor = UIColor.clear.cgColor
-      circleLayer.strokeColor = colors[i % colors.count]
-      circleLayer.lineWidth = CGFloat.random(in: 1.0...3.0)
-
-      let animation = CABasicAnimation(keyPath: "transform.scale")
-      animation.fromValue = 0
-      animation.toValue = 1
-      animation.duration = duration
-      animation.beginTime = CACurrentMediaTime() + delay * Double(i)
-      animation.timingFunction = CAMediaTimingFunction(name: .easeIn)
-
-      let groupAnimation = CAAnimationGroup()
-      groupAnimation.animations = [animation]
-      groupAnimation.duration = duration + delay * Double(number - 1)
-      groupAnimation.repeatCount = .infinity
-
-      circleLayer.add(groupAnimation, forKey: "scaleAnimation")
-
-      let randomX = CGFloat.random(in: -offsetDiff...offsetDiff)
-      let randomY = CGFloat.random(in: -offsetDiff...offsetDiff)
-      circleLayer.position = CGPoint(x: containerView.bounds.midX + randomX, y: containerView.bounds.midY + randomY)
-
-      containerLayer.addSublayer(circleLayer)
-    }
-
-    return containerView
+  func makeUIView(context: Context) -> UIRippleView {
+    return UIRippleView(frame: frame)
   }
 
-  func updateUIView(_ uiView: UIView, context: Context) {}
+  func updateUIView(_ uiView: UIRippleView, context: Context) {
+//    uiView.frame = frame
+    uiView.strokeColor = colors[0]
+    uiView.number = number
+    uiView.update()
+//    uiView.frame = frame
+  }
 }
 
-//func generateGradientColors(startColor: Color, endColor: Color, numberOfColors: Int) -> [Color] {
-//  let startComponents = startColor.cgColor.components ?? []
-//  let endComponents = endColor.cgColor.components ?? []
-//
-//  var colors: [Color] = []
-//
-//  for i in 0..<numberOfColors {
-//    let progress = CGFloat(i) / CGFloat(numberOfColors - 1)
-//    let r = startComponents[0] + (endComponents[0] - startComponents[0]) * progress
-//    let g = startComponents[1] + (endComponents[1] - startComponents[1]) * progress
-//    let b = startComponents[2] + (endComponents[2] - startComponents[2]) * progress
-//    let color = Color(red: Double(r), green: Double(g), blue: Double(b))
-//    colors.append(color)
-//  }
-//
-//  return colors
-//}
+
+
+
+
 
 struct RIppleLayerView: View {
   @State var isShow = true
@@ -123,7 +189,8 @@ struct RIppleLayerView: View {
     VStack {
       ZStack {
         RippleLayerCircles(isShow: $isShow, number: rippleNum, startColor: startColor, endColor: endColor, duration: duration, delay: duration / Double(rippleNum), offsetDiff: 3)
-          .frame(width: 150, height: 150)
+          .frame(width: 200, height: 200)
+
         //          .border(Color.green)
         Button(action: {
           isShow.toggle()

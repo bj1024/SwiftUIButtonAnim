@@ -530,13 +530,13 @@ struct ContentView: View {
   let color = Color(#colorLiteral(red: 0, green: 0.6230022509, blue: 1, alpha: 0.8020036139))
   let startColor = Color(#colorLiteral(red: 0, green: 0.6230022509, blue: 1, alpha: 0.8020036139))
   let endColor = Color(#colorLiteral(red: 0.05724914705, green: 0, blue: 1, alpha: 0.7992931548))
-  let duration: Double = 2.0
-  let rippleNum: Int = 8
+  let duration: Double = 10.0
+  let rippleNum: Int = 100
   var body: some View {
     VStack {
       ZStack {
         RippleCircles(isShow: $isShow, number: rippleNum, startColor: startColor, endColor: endColor, duration: duration, delay: duration / Double(rippleNum), offsetDiff: 3)
-          .frame(width: 150,height: 150)
+          .frame(width: 250,height: 250)
 //          .border(Color.green)
         Button(action: {
           isShow.toggle()
