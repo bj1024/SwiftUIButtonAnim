@@ -33,10 +33,38 @@ struct RippleLayerCircles: View {
   var body: some View {
     ZStack {
       GeometryReader { proxy in
-        CircleLayerView(frame: proxy.frame(in: .local), number: number, colors: colors, duration: duration, delay: delay, offsetDiff: offsetDiff)
-          .frame(width: .infinity,height: .infinity)
+        CircleLayerView(number: number, colors: colors, duration: duration, delay: delay, offsetDiff: offsetDiff)
+//          .frame(width: .infinity,height: .infinity)
+          .frame(width: 200 ,height: 200)
       }
     }
+  }
+}
+
+
+struct CircleLayerView: UIViewRepresentable {
+ 
+  var number: Int
+  var colors: [CGColor]
+  var duration: Double
+  var delay: Double
+  var offsetDiff: Double
+
+  func makeUIView(context: Context) -> UIRippleView {
+    let view = UIRippleView()
+//    view.setContentHuggingPriority(.required, for: .horizontal) // << here !!
+//    view.setContentHuggingPriority(.required, for: .vertical)
+
+    return view
+  }
+
+
+  func updateUIView(_ uiView: UIRippleView, context: Context) {
+//    uiView.frame = frame
+    uiView.strokeColor = colors[0]
+    uiView.number = number
+//    uiView.update()
+//    uiView.frame = frame
   }
 }
 
@@ -44,24 +72,25 @@ class UIRippleView: UIView {
   
   var number:Int = 0
   var strokeColor: CGColor = UIColor.black.cgColor
+  var offsetDiff:Double = 5
   private var  layers:[CAShapeLayer] =  []
-  
-  override init(frame: CGRect) {
-    print("init frame=\(frame)")
-    super.init(frame: frame)
-    self.frame = frame
-//    self.backgroundColor = UIColor.clear
+//  
+//  override init(frame: CGRect) {
+//    print("init frame=\(frame)")
+//    super.init(frame: frame)
+////    self.frame = frame
+////    self.backgroundColor = UIColor.clear
 //    initLanyer()
-  }
-  
-  required init?(coder aDecoder: NSCoder) {
-    print("init coder")
-    super.init(coder: aDecoder)
-//    initLanyer()
-  }
+//  }
+//  
+//  required init?(coder aDecoder: NSCoder) {
+//    print("init coder")
+//    super.init(coder: aDecoder)
+////    initLanyer()
+//  }
 
   func initLanyer() {
-    self.layer.borderWidth = 2
+    self.layer.borderWidth = 3
     self.layer.borderColor = UIColor.red.cgColor
 
     let duration = 5.0
@@ -71,7 +100,7 @@ class UIRippleView: UIView {
     print("initLayer = \(frame)")
     layers = []
     for i in 0 ..< number {
-      let layer = addCircleLayer(position: CGPoint(x: 0, y: 0),
+      let layer = addCircleLayer(position: CGPoint(x: Double.random(in: -offsetDiff...offsetDiff), y: Double.random(in: -offsetDiff...offsetDiff)),
                       size: bounds.size,
                                   strokeColor: strokeColor,
                       duration: duration,
@@ -144,33 +173,19 @@ class UIRippleView: UIView {
 //    circleLayer.add(animation, forKey: nil)
     return circleLayer
   }
-  func update(){
-    print("update = \(frame)")
-    initLanyer()
+  
+  override func layoutSubviews() {
+    print("layoutSubviews = \(frame)")
+    
+     
+      initLanyer()
+   
   }
+  
+   
+  
 }
 
-
-struct CircleLayerView: UIViewRepresentable {
-  let frame: CGRect
-  var number: Int
-  var colors: [CGColor]
-  var duration: Double
-  var delay: Double
-  var offsetDiff: Double
-
-  func makeUIView(context: Context) -> UIRippleView {
-    return UIRippleView(frame: frame)
-  }
-
-  func updateUIView(_ uiView: UIRippleView, context: Context) {
-//    uiView.frame = frame
-    uiView.strokeColor = colors[0]
-    uiView.number = number
-    uiView.update()
-//    uiView.frame = frame
-  }
-}
 
 
 
@@ -183,7 +198,7 @@ struct RIppleLayerView: View {
   let startColor = Color(#colorLiteral(red: 0, green: 0.6230022509, blue: 1, alpha: 0.8020036139))
   let endColor = Color(#colorLiteral(red: 0.05724914705, green: 0, blue: 1, alpha: 0.7992931548))
   let duration = 2.0
-  let rippleNum = 8
+  let rippleNum = 10
 
   var body: some View {
     VStack {

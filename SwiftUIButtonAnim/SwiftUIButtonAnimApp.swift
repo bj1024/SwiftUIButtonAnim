@@ -9,7 +9,8 @@ import SwiftUI
 struct SwiftUIButtonAnimApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+//            ContentView()
+          RIppleLayerView()
         }
     }
 }
