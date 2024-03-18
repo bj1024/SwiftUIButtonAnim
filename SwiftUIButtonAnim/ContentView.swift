@@ -371,8 +371,8 @@ struct RippleCircleExplicitTimer: View {
 
 //      Text("isExpanded = \(isExpanded)")
     }
-    .onChange(of: isShow) {
-      print("onChange isShow=\(isShow)")
+    .onChange(of: isShow) { value in
+      print("onChange isShow=\(value)")
       repeatAnimation()
     }
     .onAppear {
@@ -422,7 +422,8 @@ struct RippleCircles: View {
   let colors: [Color]
 
   @State var isExpandeds: [Bool]
-  @State var isRepeating = false
+  @State private var timer: Timer?
+  @Environment(\.scenePhase) private var scenePhase
 
   init(isShow: Binding<Bool>, number: Int, startColor: Color, endColor: Color, duration: Double, delay: Double, offsetDiff: Double) {
     self._isShow = isShow
@@ -443,32 +444,73 @@ struct RippleCircles: View {
           Circle()
             .offset(CGSize(width: Double.random(in: -offsetDiff...offsetDiff),
                            height: Double.random(in: -offsetDiff...offsetDiff)))
-            //                    .stroke(Color.blue, lineWidth: 1)
-            .stroke(colors[index % colors.count], lineWidth: Double.random(in: 1.0...5.0))
+            .stroke(colors[index % colors.count], lineWidth: Double.random(in: 1.0...3.0))
             .scaleEffect(isExpandeds[index] ? 1 : 0)
             .opacity(isExpandeds[index] ? 0 : 1)
         }
       }
+      
 
 //      Text("isExpanded = \(isExpanded)")
     }
-    .onChange(of: isShow) {
-      print("onChange isShow=\(isShow)")
-      repeatAnimation()
+    .onChange(of: isShow) { newValue in
+      print("onChange isShow=\(newValue)")
+      if newValue {
+//        resetAnimPosition()
+        repeatAnimation()
+      }
+      else{
+       // 現在のアニメーションが終わった時のタイマーで停止するので、ここでは処理を行わない
+      }
+      
     }
     .onAppear {
       print("onAppear isShow=\(isShow)")
       repeatAnimation()
     }
+    .onDisappear {
+      print("onDisappear isShow=\(isShow)")
+//      timer?.invalidate()
+    }
+    .onChange(of: scenePhase) { phase in
+      switch phase {
+      case .active:
+        print("scenePhase active")
+//        resetAnimPosition()
+//        if isShow {
+//          repeatAnimation()
+//        }
+      case .inactive:
+//        resetAnimPosition()
+//        timer?.invalidate()
+        isShow = false
+        
+        print("scenePhase inactive")
+      case .background:
+        print("scenePhase background")
+      @unknown default:
+        print("scenePhase @unknown")
+      }
+    }
   }
 
   func repeatAnimation() {
-    if isRepeating {
-      print("repeatAnimation isRepeating=\(isRepeating) exit")
+    if self.timer != nil {
+      print("repeatAnimation reenterd exit")
       return
     }
-    print("repeatAnimation isShow=\(isShow)")
-    isRepeating = true
+    self.timer = Timer.scheduledTimer(withTimeInterval: duration + Double(isExpandeds.count - 1) * delay, repeats: false) { _ in
+      print("repeatAnimation timer")
+      self.timer = nil
+//      isRepeating = false
+      resetAnimPosition()
+      if isShow {
+        repeatAnimation()
+      }
+      
+    }
+    //    print("repeatAnimation isShow=\(isShow)")
+//    isRepeating = true
 
     for i in 0..<isExpandeds.count {
       withAnimation(.easeIn(duration: duration).delay(delay * Double(i))) {
@@ -476,21 +518,19 @@ struct RippleCircles: View {
       }
     }
 
-    // 上記のアニメーションを無限に繰り返す
-    DispatchQueue.main.asyncAfter(deadline: .now() + duration + Double(isExpandeds.count - 1) * delay) {
-      isRepeating = false
-      isExpandeds = Array(repeating: false, count: isExpandeds.count)
-      if isShow {
-        repeatAnimation()
-      }
-    }
-//    Timer.scheduledTimer(withTimeInterval: duration + animationDelay, repeats: false) { _ in
-//      isRepeating = false
-//      isExpanded = false
-//      if isShow {
-//        repeatAnimation()
-//      }
-//    }
+    //    // 上記のアニメーションを無限に繰り返す
+    //    DispatchQueue.main.asyncAfter(deadline: .now() + duration + Double(isExpandeds.count - 1) * delay) {
+    //      isRepeating = false
+    //      isExpandeds = Array(repeating: false, count: isExpandeds.count)
+    //      if isShow {
+    //        repeatAnimation()
+    //      }
+    //    }
+
+  }
+
+  func resetAnimPosition() {
+    isExpandeds = Array(repeating: false, count: isExpandeds.count)
   }
 }
 
@@ -499,22 +539,22 @@ struct ContentView: View {
   let color = Color(#colorLiteral(red: 0, green: 0.6230022509, blue: 1, alpha: 0.8020036139))
   let startColor = Color(#colorLiteral(red: 0, green: 0.6230022509, blue: 1, alpha: 0.8020036139))
   let endColor = Color(#colorLiteral(red: 0.05724914705, green: 0, blue: 1, alpha: 0.7992931548))
-  let duration:Double = 3.0
-  let rippleNum:Int = 10
+  let duration: Double = 2.0
+  let rippleNum: Int = 8
   var body: some View {
     VStack {
       ZStack {
-        RippleCircles(isShow: $isShow, number: rippleNum, startColor: startColor, endColor: endColor, duration: duration, delay: duration/Double(rippleNum), offsetDiff: 6)
-          .frame(width: 300)
-          .border(Color.green)
+        RippleCircles(isShow: $isShow, number: rippleNum, startColor: startColor, endColor: endColor, duration: duration, delay: duration / Double(rippleNum), offsetDiff: 3)
+          .frame(width: 150,height: 150)
+//          .border(Color.green)
         Button(action: {
           isShow.toggle()
         }) {
           Text(isShow ? "Stop" : "Start")
 
-//            .font(.caption2)
+            .font(.caption2)
             .foregroundColor(.white)
-            .frame(width: 80, height: 80)
+            .frame(width: 50, height: 20)
 //            .padding()
             .background(isShow ? Color.red : Color.blue)
             .cornerRadius(40)
