@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		20422AF52BA8249C0085B2B0 /* RIppleLayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20422AF42BA8249C0085B2B0 /* RIppleLayerView.swift */; };
 		20F941022BA566090059342B /* SwiftUIButtonAnimApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F941012BA566090059342B /* SwiftUIButtonAnimApp.swift */; };
 		20F941042BA566090059342B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F941032BA566090059342B /* ContentView.swift */; };
 		20F941062BA5660A0059342B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 20F941052BA5660A0059342B /* Assets.xcassets */; };
@@ -34,6 +35,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		20422AF42BA8249C0085B2B0 /* RIppleLayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RIppleLayerView.swift; sourceTree = "<group>"; };
 		20F940FE2BA566090059342B /* SwiftUIButtonAnim.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUIButtonAnim.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		20F941012BA566090059342B /* SwiftUIButtonAnimApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIButtonAnimApp.swift; sourceTree = "<group>"; };
 		20F941032BA566090059342B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -96,6 +98,7 @@
 			children = (
 				20F941012BA566090059342B /* SwiftUIButtonAnimApp.swift */,
 				20F941032BA566090059342B /* ContentView.swift */,
+				20422AF42BA8249C0085B2B0 /* RIppleLayerView.swift */,
 				20F941052BA5660A0059342B /* Assets.xcassets */,
 				20F941072BA5660A0059342B /* Preview Content */,
 			);
@@ -257,6 +260,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				20422AF52BA8249C0085B2B0 /* RIppleLayerView.swift in Sources */,
 				20F941042BA566090059342B /* ContentView.swift in Sources */,
 				20F941022BA566090059342B /* SwiftUIButtonAnimApp.swift in Sources */,
 			);
