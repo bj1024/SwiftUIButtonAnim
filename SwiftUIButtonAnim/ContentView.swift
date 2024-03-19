@@ -460,6 +460,7 @@ struct RippleCircles: View {
             .opacity(isExpandeds[index] ? 0 : 1)
         }
       }
+      .compositingGroup()
     }
     .onChange(of: isShow) { newValue in
       print("onChange isShow=\(newValue)")

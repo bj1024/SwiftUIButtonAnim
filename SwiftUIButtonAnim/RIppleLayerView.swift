@@ -69,6 +69,7 @@ struct CircleLayerView: UIViewRepresentable {
     }
     uiView.strokeColor = colors[0]
     uiView.number = number
+    uiView.isShow = isShow
 //    uiView.update()
 //    uiView.frame = frame
   }
@@ -180,7 +181,7 @@ class UIRippleView: UIView ,CAAnimationDelegate{
     animationGroup.duration = 2.0
     animationGroup.beginTime = CACurrentMediaTime() + delay
     animationGroup.fillMode = CAMediaTimingFillMode.forwards
-//    animationGroup.repeatCount = .infinity
+    animationGroup.repeatCount = .infinity
     animationGroup.isRemovedOnCompletion = false
 
     let animation1 = CABasicAnimation(keyPath: "transform.scale")
@@ -214,7 +215,7 @@ class UIRippleView: UIView ,CAAnimationDelegate{
 
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
     print("animationDidStop" )
-    anim.
+    //anim.
 
   }
 }
@@ -266,7 +267,7 @@ struct RIppleLayerView: View {
     }
     .padding()
     .background(Color.black)
-    .frame(width: .infinity, height: .infinity)
+//    .frame(width: .infinity, height: .infinity)
   }
 }
 
