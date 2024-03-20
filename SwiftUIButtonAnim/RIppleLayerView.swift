@@ -76,12 +76,12 @@ struct CircleLayerView: UIViewRepresentable {
   }
 }
 
-class UIRippleView: UIView ,CAAnimationDelegate{
+class UIRippleView: UIView, CAAnimationDelegate {
   var isShow: Bool = false
   var number: Int = 0
   var strokeColor: CGColor = UIColor.black.cgColor
   var offsetDiff: Double = 10
-  private var baseLayer: CALayer = CALayer()
+  private var baseLayer: CALayer = .init()
   private var layers: [CAShapeLayer] = []
 
   func removeAllLayers() {
@@ -89,22 +89,36 @@ class UIRippleView: UIView ,CAAnimationDelegate{
     print("removeAllLayers")
     // layers.forEach {
 
-      let animation = CABasicAnimation(keyPath: "opacity")
-      animation.fromValue = 1
-      animation.toValue = 0
-      animation.duration = 1
-      animation.timingFunction = CAMediaTimingFunction(name: .easeIn)
-      animation.isRemovedOnCompletion = false
-      baseLayer.add(animation, forKey: "baseLayerfadeOut")
+    let animation = CABasicAnimation(keyPath: "opacity")
+    animation.fromValue = 1
+    animation.toValue = 0
+    animation.duration = 3
+    animation.timingFunction = CAMediaTimingFunction(name: .easeIn)
+    animation.isRemovedOnCompletion = false
+    animation.repeatCount = 1
+    animation.setValue("baseLayerFadeout", forKey: "animId")
+    animation.setValue(baseLayer, forKey: "parentLayer")
+    animation.delegate = self
+    baseLayer.add(animation, forKey: "baseLayerFadeout")
     // }
-    DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
       // self.layers.forEach {
       //   // layerを削除
       //   $0.removeFromSuperlayer()
       // }
       // self.layers = []
-      self.baseLayer.removeFromSuperlayer()
-      self.baseLayer = CALayer()
+//      self.baseLayer.removeFromSuperlayer()
+//      self.baseLayer = CALayer()
+
+      print("removeAllLayers remove")
+      self.layers.forEach {
+        // layerを削除
+        print("removeAllLayers remove layer")
+
+        $0.removeFromSuperlayer()
+      }
+
+      self.layers = []
     }
 
     //
@@ -147,15 +161,14 @@ class UIRippleView: UIView ,CAAnimationDelegate{
       layers.append(layer)
     }
     self.layer.addSublayer(baseLayer)
-
   }
 
-  func createAnim(position:CGPoint, delay:Double) -> CAAnimationGroup{
+  func createAnim(position: CGPoint, delay: Double) -> CAAnimationGroup {
     let animGroup = CAAnimationGroup()
     animGroup.duration = 2.0
     animGroup.beginTime = CACurrentMediaTime() + delay
     animGroup.fillMode = CAMediaTimingFillMode.forwards
-   animGroup.repeatCount = .infinity
+    animGroup.repeatCount = .infinity
     animGroup.isRemovedOnCompletion = false
 
     let animation1 = CABasicAnimation(keyPath: "transform.scale")
@@ -171,9 +184,10 @@ class UIRippleView: UIView ,CAAnimationDelegate{
     animation3.toValue = [position.x, position.y]
 
     animGroup.animations = [animation1, animation2, animation3]
-    animGroup.delegate = self
+
     return animGroup
   }
+
   func addCircleLayer(position: CGPoint, size: CGSize,
                       strokeColor: CGColor, duration: Double, delay: Double) -> CAShapeLayer
   {
@@ -207,10 +221,11 @@ class UIRippleView: UIView ,CAAnimationDelegate{
 //
 //    circleLayer.add(groupAnimation, forKey: "scaleAnimation")
 
-
     let animGroup = createAnim(position: position, delay: delay)
-
-    circleLayer.add(animGroup, forKey: "rippleanim")
+    animGroup.setValue("ripple", forKey: "animId")
+    animGroup.setValue(circleLayer, forKey: "parentLayer")
+    animGroup.delegate = self
+    circleLayer.add(animGroup, forKey: "ripple")
     return circleLayer
   }
 
@@ -220,22 +235,23 @@ class UIRippleView: UIView ,CAAnimationDelegate{
       initLanyer()
     } else {
       // layerがあればfadeoutさせる
-      
-
     }
   }
 
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
-    print("animationDidStop")
-
-    // print("CAAnimation name: \(anim.value(forKey: "name") ?? "")")
-    if let anim = self.baseLayer.animation(forKey: "rippleanim") {
-      print("rippleanim DidStop")
+    var animId = ""
+    if let id = anim.value(forKey: "animId") as? String {
+      animId = id
     }
-    // else if let anim = self.layers.animation(forKey: "baseLayerfadeOut") {
-    //   print("baseLayerfadeOut DidStop")
-    // }
-
+    print("animation DidStop \(flag ? "true" : "false") id=[\(animId)]")
+    if flag, let layer = anim.value(forKey: "parentLayer") as? CALayer {
+      print("layer removeAnimation")
+//      layer.backgroundColor = UIColor.black.cgColor
+//      layer.removeAnimation(forKey: animId)
+//      if animId == "ripple" {
+//        layer.add(anim, forKey: animId)
+//      }
+    }
   }
 }
 
@@ -283,7 +299,7 @@ struct RippleLayerView: View {
       }
 
       Text("isShow = \(isShow)")
-      .foregroundColor(.white)
+        .foregroundColor(.white)
     }
     .padding()
     .background(Color.black)
