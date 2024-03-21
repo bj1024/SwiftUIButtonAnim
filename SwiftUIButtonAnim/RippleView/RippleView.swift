@@ -13,7 +13,8 @@ struct RippleView: UIViewRepresentable {
   var colors: [Color]
   var duration: Double
   var delay: Double
-  var offsetDiff: Double
+  var interval: Double = 0.5
+  var positionDiff: Double
 
   func makeUIView(context: Context) -> UIRippleView {
     let view = UIRippleView()
@@ -29,6 +30,9 @@ struct RippleView: UIViewRepresentable {
     print("updateUIView isShow=\(isShow) ")
     uiView.isShow = isShow
     uiView.numberOfCircles = numberOfCircles
+    uiView.duration = duration
+    uiView.interval = interval
+    uiView.positionDiff = positionDiff
     uiView.circleColors = colors.map{
       UIColor($0)
     }

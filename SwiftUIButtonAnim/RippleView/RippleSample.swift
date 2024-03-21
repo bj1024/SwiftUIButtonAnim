@@ -43,13 +43,16 @@ func createGradientColors(from startColor: Color, to endColor: Color, withCount 
 let gradientColors = createGradientColors(from: Color.red, to: Color.blue, withCount: 5)
 
 struct RippleSample: View {
-  @State var isShow = true
+  @State var size = 100.0
 
+
+  @State var isShow = true
   @State var startColor = Color(#colorLiteral(red: 0, green: 0.6230022509, blue: 1, alpha: 0.8020036139))
   //  let endColor = Color(#colorLiteral(red: 0.05724914705, green: 0, blue: 1, alpha: 0.7992931548))
-  @State var endColor = Color(#colorLiteral(red: 0.9686274529, green: 0.78039217, blue: 0.3450980484, alpha: 1))
-  @State var duration: Double = 2.0
+  @State var endColor = Color(#colorLiteral(red: 0.04023407099, green: 0.2384221714, blue: 0.5562983247, alpha: 0.8))
+  @State var duration: Double = 3.0
   @State var numberOfCircles: Int = 10
+  @State var positionDiff: Double = 2
 
 
   var intProxy: Binding<Double> {
@@ -74,9 +77,10 @@ struct RippleSample: View {
                    numberOfCircles: numberOfCircles,
                    colors: createGradientColors(from: startColor, to: endColor, withCount: numberOfCircles),
                    duration: duration,
-                   delay: duration / Double(numberOfCircles),
-                   offsetDiff: 3)
-          .frame(width: 200, height: 200)
+                   delay:  (duration * 0.9) / Double(numberOfCircles),
+                   interval: duration / 1,
+                   positionDiff: positionDiff)
+          .frame(width: size, height: size)
 
         Button(action: {
           isShow.toggle()
@@ -96,25 +100,24 @@ struct RippleSample: View {
       Text("isShow = \(isShow)")
         .foregroundColor(.white)
 
+      Text("size = \(String(format:"%0f",size))")
+        .foregroundColor(.white)
+      Slider(value: $size, in: 0.0 ... 300.0, step: 1.0)
+
+      
       Text("numberOfCircles = \(numberOfCircles)")
         .foregroundColor(.white)
+      Slider(value: intProxy, in: 0.0 ... 300.0, step: 1.0)
 
-      Slider(value: intProxy, in: 0.0 ... 500.0, step: 1.0)
+      Text("duration = \(String(format:"%0.1f",duration))")
+        .foregroundColor(.white)
+      Slider(value: $duration, in: 0.0 ... 10.0, step: 0.1)
 
-        .padding()
+      Text("positionDiff = \(String(format:"%0.1f",positionDiff))")
+        .foregroundColor(.white)
+      Slider(value: $positionDiff, in: 0.0 ... 50.0, step: 1.0)
 
-      Button(action: {
-        isShow.toggle()
-      }) {
-        Text(isShow ? "Stop" : "Start")
-
-          .font(.caption2)
-          .foregroundColor(.white)
-          .frame(width: 50, height: 20)
-          //            .padding()
-          .background(isShow ? Color.red : Color.blue)
-          .cornerRadius(40)
-      }
+      
     }
     .padding()
 
