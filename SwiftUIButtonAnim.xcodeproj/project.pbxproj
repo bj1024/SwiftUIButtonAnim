@@ -81,8 +81,8 @@
 			isa = PBXGroup;
 			children = (
 				2056844B2BABB91600E34789 /* UIRippleView.swift */,
-				20422AF42BA8249C0085B2B0 /* RippleSample.swift */,
 				2056844D2BABBA3C00E34789 /* RippleView.swift */,
+				20422AF42BA8249C0085B2B0 /* RippleSample.swift */,
 			);
 			path = RippleView;
 			sourceTree = "<group>";

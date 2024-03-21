@@ -43,17 +43,18 @@ func createGradientColors(from startColor: Color, to endColor: Color, withCount 
 let gradientColors = createGradientColors(from: Color.red, to: Color.blue, withCount: 5)
 
 struct RippleSample: View {
-  @State var size = 100.0
-
+  @State var rippleWidth = 200.0
+  @State var rippleHeight = 200.0
 
   @State var isShow = true
   @State var startColor = Color(#colorLiteral(red: 0, green: 0.6230022509, blue: 1, alpha: 0.8020036139))
   //  let endColor = Color(#colorLiteral(red: 0.05724914705, green: 0, blue: 1, alpha: 0.7992931548))
   @State var endColor = Color(#colorLiteral(red: 0.04023407099, green: 0.2384221714, blue: 0.5562983247, alpha: 0.8))
   @State var duration: Double = 3.0
+  @State var delay: Double = 0.5
+  @State var interval: Double = 3.0
   @State var numberOfCircles: Int = 10
   @State var positionDiff: Double = 2
-
 
   var intProxy: Binding<Double> {
     Binding<Double>(get: {
@@ -66,9 +67,7 @@ struct RippleSample: View {
     })
   }
 
-  init() {
-   
-  }
+  init() {}
 
   var body: some View {
     VStack {
@@ -77,52 +76,66 @@ struct RippleSample: View {
                    numberOfCircles: numberOfCircles,
                    colors: createGradientColors(from: startColor, to: endColor, withCount: numberOfCircles),
                    duration: duration,
-                   delay:  (duration * 0.9) / Double(numberOfCircles),
-                   interval: duration / 1,
+                   delay: delay,
+                   interval: interval,
                    positionDiff: positionDiff)
-          .frame(width: size, height: size)
+          .frame(width: rippleWidth, height: rippleHeight)
 
         Button(action: {
           isShow.toggle()
         }) {
           Text(isShow ? "Stop" : "Start")
-
+            .foregroundColor(Color(uiColor: UIColor.white))
             .font(.caption2)
-            .foregroundColor(.white)
             .frame(width: 50, height: 20)
-            //            .padding()
             .background(isShow ? Color.red : Color.blue)
             .cornerRadius(40)
         }
-        //      .padding(.top, 50)
       }
+      .background(Color(uiColor: UIColor.systemBackground))
+      .clipped()
+      .border(Color.red)
+      Spacer()
+      List {
+        VStack {
+          Text("startColor")
+          ColorPicker("startColor", selection: $startColor)
+          Text("endColor")
+          ColorPicker("endColor", selection: $endColor)
 
-      Text("isShow = \(isShow)")
-        .foregroundColor(.white)
+          Text("isShow=\(isShow)")
 
-      Text("size = \(String(format:"%0f",size))")
-        .foregroundColor(.white)
-      Slider(value: $size, in: 0.0 ... 300.0, step: 1.0)
+          Text("size=\(String(format: "%0.0f,%0.0f", rippleWidth, rippleHeight))")
 
-      
-      Text("numberOfCircles = \(numberOfCircles)")
-        .foregroundColor(.white)
-      Slider(value: intProxy, in: 0.0 ... 300.0, step: 1.0)
+          Slider(value: $rippleWidth, in: 0.0 ... 300.0, step: 10.0)
+          Slider(value: $rippleHeight, in: 0.0 ... 300.0, step: 10.0)
 
-      Text("duration = \(String(format:"%0.1f",duration))")
-        .foregroundColor(.white)
-      Slider(value: $duration, in: 0.0 ... 10.0, step: 0.1)
+          Text("numberOfCircles=\(numberOfCircles)")
 
-      Text("positionDiff = \(String(format:"%0.1f",positionDiff))")
-        .foregroundColor(.white)
-      Slider(value: $positionDiff, in: 0.0 ... 50.0, step: 1.0)
+          Slider(value: intProxy, in: 0.0 ... 300.0, step: 1.0)
 
-      
+          Text("duration=\(String(format: "%0.1f", duration))")
+
+          Slider(value: $duration, in: 0.0 ... 10.0, step: 0.1)
+          Text("delay=\(String(format: "%0.1f", delay))")
+
+          Slider(value: $delay, in: 0.0 ... 10.0, step: 0.1)
+
+          Text("interval=\(String(format: "%0.1f", interval))")
+
+          Slider(value: $interval, in: 0.0 ... 10.0, step: 0.1)
+
+          Text("positionDiff=\(String(format: "%0.1f", positionDiff))")
+
+          Slider(value: $positionDiff, in: 0.0 ... 50.0, step: 1.0)
+        }
+      }
+      .listStyle(.inset)
+      .padding(8)
+
     }
-    .padding()
-
-    .background(Color.black)
-//    .frame(width: .infinity, height: .infinity)
+    .background(Color(uiColor: UIColor.secondarySystemBackground))
+    .frame(width: .infinity, height: .infinity)
   }
 }
 
