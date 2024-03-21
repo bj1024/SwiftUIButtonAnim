@@ -62,14 +62,14 @@ struct CircleLayerView: UIViewRepresentable {
 //    uiView.frame = frame
     // isShow でアニメーションを止める
     print("updateUIView isShow=\(isShow) ")
-    if isShow {
-      uiView.initLanyer()
-    } else {
-      uiView.removeAllLayers()
-    }
-    uiView.strokeColor = colors[0]
-    uiView.number = number
-    uiView.isShow = isShow
+//    if isShow {
+//      uiView.initLanyer()
+//    } else {
+//      uiView.removeAllLayers()
+//    }
+//    uiView.strokeColor = colors[0]
+//    uiView.number = number
+//    uiView.isShow = isShow
 
 //    uiView.update()
 //    uiView.frame = frame
@@ -81,9 +81,20 @@ class UIRippleView: UIView, CAAnimationDelegate {
   var number: Int = 0
   var strokeColor: CGColor = UIColor.black.cgColor
   var offsetDiff: Double = 10
-  private var baseLayer: CALayer = .init()
+  private var baseLayer: CALayer = CALayer()
   private var layers: [CAShapeLayer] = []
-
+ 
+  
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    print("layoutSubviews = \(frame)")
+    if isShow {
+      initLanyer()
+    } else {
+      // layerがあればfadeoutさせる
+    }
+  }
+  
   func removeAllLayers() {
     // layerがあればfadeoutさせ、removeFromSuperlayerで取り除く
     print("removeAllLayers")
@@ -115,6 +126,7 @@ class UIRippleView: UIView, CAAnimationDelegate {
         // layerを削除
         print("removeAllLayers remove layer")
 
+        $0.removeAllAnimations()
         $0.removeFromSuperlayer()
       }
 
@@ -210,7 +222,7 @@ class UIRippleView: UIView, CAAnimationDelegate {
 //    let animation = CABasicAnimation(keyPath: "transform.scale")
 //    animation.fromValue = 0
 //    animation.toValue = 1
-//    animation.duration = 3
+//    animation.duration = 3´˝
     // animation.beginTime = CACurrentMediaTime() + 0.1
 //    animation.timingFunction = CAMediaTimingFunction(name: .easeIn)
 //
@@ -229,14 +241,6 @@ class UIRippleView: UIView, CAAnimationDelegate {
     return circleLayer
   }
 
-  override func layoutSubviews() {
-    print("layoutSubviews = \(frame)")
-    if isShow {
-      initLanyer()
-    } else {
-      // layerがあればfadeoutさせる
-    }
-  }
 
   func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
     var animId = ""
