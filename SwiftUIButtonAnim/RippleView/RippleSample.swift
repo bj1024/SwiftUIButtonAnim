@@ -69,6 +69,12 @@ struct RippleSample: View {
 
   init() {}
 
+  var startColorItem: some View {
+    VStack {
+      ColorPicker("startColor", selection: $startColor)
+    }
+  }
+
   var body: some View {
     VStack {
       ZStack {
@@ -97,42 +103,47 @@ struct RippleSample: View {
       .border(Color.red)
       Spacer()
       List {
+        Text("isShow=\(isShow)")
+
+        startColorItem
+
+        ColorPicker("endColor", selection: $endColor)
+
         VStack {
-          Text("startColor")
-          ColorPicker("startColor", selection: $startColor)
-          Text("endColor")
-          ColorPicker("endColor", selection: $endColor)
-
-          Text("isShow=\(isShow)")
-
           Text("size=\(String(format: "%0.0f,%0.0f", rippleWidth, rippleHeight))")
 
           Slider(value: $rippleWidth, in: 0.0 ... 300.0, step: 10.0)
           Slider(value: $rippleHeight, in: 0.0 ... 300.0, step: 10.0)
-
+        }
+        VStack {
           Text("numberOfCircles=\(numberOfCircles)")
-
           Slider(value: intProxy, in: 0.0 ... 300.0, step: 1.0)
-
+          
+        }
+        .padding(10)
+      
+        VStack {
           Text("duration=\(String(format: "%0.1f", duration))")
 
           Slider(value: $duration, in: 0.0 ... 10.0, step: 0.1)
+        }
+        VStack {
           Text("delay=\(String(format: "%0.1f", delay))")
-
           Slider(value: $delay, in: 0.0 ... 10.0, step: 0.1)
+        }
 
+        VStack {
           Text("interval=\(String(format: "%0.1f", interval))")
-
           Slider(value: $interval, in: 0.0 ... 10.0, step: 0.1)
+        }
 
+        VStack {
           Text("positionDiff=\(String(format: "%0.1f", positionDiff))")
-
           Slider(value: $positionDiff, in: 0.0 ... 50.0, step: 1.0)
         }
       }
       .listStyle(.inset)
       .padding(8)
-
     }
     .background(Color(uiColor: UIColor.secondarySystemBackground))
     .frame(width: .infinity, height: .infinity)
