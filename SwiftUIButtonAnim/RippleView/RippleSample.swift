@@ -78,6 +78,11 @@ struct RippleSample: View {
   var body: some View {
     VStack {
       ZStack {
+        Image("medium")
+          .resizable()
+          .aspectRatio(contentMode: .fit)
+          .frame(width: 300, height: 300)
+       
         RippleView(isShow: isShow,
                    numberOfCircles: numberOfCircles,
                    colors: createGradientColors(from: startColor, to: endColor, withCount: numberOfCircles),
@@ -86,6 +91,7 @@ struct RippleSample: View {
                    interval: interval,
                    positionDiff: positionDiff)
           .frame(width: rippleWidth, height: rippleHeight)
+          .blendMode(.colorDodge)
 
         Button(action: {
           isShow.toggle()
@@ -101,6 +107,8 @@ struct RippleSample: View {
       .background(Color(uiColor: UIColor.systemBackground))
       .clipped()
       .border(Color.red)
+      
+      
       Spacer()
       List {
         Text("isShow=\(isShow)")

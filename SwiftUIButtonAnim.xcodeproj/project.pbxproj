@@ -10,6 +10,8 @@
 		20422AF52BA8249C0085B2B0 /* RippleSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20422AF42BA8249C0085B2B0 /* RippleSample.swift */; };
 		2056844C2BABB91600E34789 /* UIRippleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2056844B2BABB91600E34789 /* UIRippleView.swift */; };
 		2056844E2BABBA3C00E34789 /* RippleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2056844D2BABBA3C00E34789 /* RippleView.swift */; };
+		20E948722BAED173003A933F /* ColorList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E948712BAED173003A933F /* ColorList.swift */; };
+		20E948742BAEDDAE003A933F /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E948732BAEDDAE003A933F /* ListItem.swift */; };
 		20F941022BA566090059342B /* SwiftUIButtonAnimApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F941012BA566090059342B /* SwiftUIButtonAnimApp.swift */; };
 		20F941042BA566090059342B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F941032BA566090059342B /* ContentView.swift */; };
 		20F941062BA5660A0059342B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 20F941052BA5660A0059342B /* Assets.xcassets */; };
@@ -40,6 +42,8 @@
 		20422AF42BA8249C0085B2B0 /* RippleSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RippleSample.swift; sourceTree = "<group>"; };
 		2056844B2BABB91600E34789 /* UIRippleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIRippleView.swift; sourceTree = "<group>"; };
 		2056844D2BABBA3C00E34789 /* RippleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RippleView.swift; sourceTree = "<group>"; };
+		20E948712BAED173003A933F /* ColorList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorList.swift; sourceTree = "<group>"; };
+		20E948732BAEDDAE003A933F /* ListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListItem.swift; sourceTree = "<group>"; };
 		20F940FE2BA566090059342B /* SwiftUIButtonAnim.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUIButtonAnim.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		20F941012BA566090059342B /* SwiftUIButtonAnimApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIButtonAnimApp.swift; sourceTree = "<group>"; };
 		20F941032BA566090059342B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -90,6 +94,7 @@
 		20F940F52BA566090059342B = {
 			isa = PBXGroup;
 			children = (
+				20E948732BAEDDAE003A933F /* ListItem.swift */,
 				20F941002BA566090059342B /* SwiftUIButtonAnim */,
 				20F941112BA5660A0059342B /* SwiftUIButtonAnimTests */,
 				20F9411B2BA5660A0059342B /* SwiftUIButtonAnimUITests */,
@@ -115,6 +120,7 @@
 				20F941032BA566090059342B /* ContentView.swift */,
 				20F941052BA5660A0059342B /* Assets.xcassets */,
 				20F941072BA5660A0059342B /* Preview Content */,
+				20E948712BAED173003A933F /* ColorList.swift */,
 			);
 			path = SwiftUIButtonAnim;
 			sourceTree = "<group>";
@@ -275,6 +281,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				20E948722BAED173003A933F /* ColorList.swift in Sources */,
+				20E948742BAEDDAE003A933F /* ListItem.swift in Sources */,
 				2056844E2BABBA3C00E34789 /* RippleView.swift in Sources */,
 				20422AF52BA8249C0085B2B0 /* RippleSample.swift in Sources */,
 				20F941042BA566090059342B /* ContentView.swift in Sources */,
