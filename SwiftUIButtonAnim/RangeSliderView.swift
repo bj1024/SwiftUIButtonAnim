@@ -24,6 +24,16 @@ struct SizePreferenceKey: PreferenceKey {
   }
 }
 
+struct VerticalLine: Shape {
+  func path(in rect: CGRect) -> Path {
+    var path = Path()
+    // 線を描画
+    path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+    path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+    return path
+  }
+}
+
 struct RangeSlider: View {
   @Binding var lowValue: Double
   @Binding var highValue: Double
@@ -42,7 +52,7 @@ struct RangeSlider: View {
 
   private let marginL = 8.0
   private let marginR = 8.0
-  private let barHeight = 4.0
+  private let barHeight = 6.0
 
   @State private var lowValueDragStart: Double?
   @State private var lowValueDragPrev: Double?
@@ -59,13 +69,13 @@ struct RangeSlider: View {
       GeometryReader { geometry in
         let sliderWidth = geometry.size.width - marginL - marginR
         // 値は左側つまみの右端から右側つまみの左端を使う
-        let valueWidth = sliderWidth - thumbSize * 2
+        let dispValueWidth = sliderWidth - thumbSize * 2
         let dispBoundDiff = dispBounds.upperBound - dispBounds.lowerBound
 
         // つまみの右端
-        let lowValuePos = marginL + thumbSize + CGFloat(self.lowValue / dispBoundDiff * valueWidth)
+        let lowValuePos = marginL + thumbSize + CGFloat(self.lowValue / dispBoundDiff * dispValueWidth)
         // つまみの左端
-        let highValuePos = marginL + thumbSize + CGFloat(self.highValue / dispBoundDiff * valueWidth)
+        let highValuePos = marginL + thumbSize + CGFloat(self.highValue / dispBoundDiff * dispValueWidth)
 
         let middleThumbPos = thumbSize / 2.0 - barHeight / 2.0
 
@@ -81,16 +91,46 @@ struct RangeSlider: View {
           //            .offset(x: CGFloat(self.minValue))
           .frame(width: highValuePos - lowValuePos, height: barHeight)
 
+        if dispBounds.lowerBound < valueBounds.lowerBound {
+          VerticalLine()
+            .stroke(style: StrokeStyle(lineWidth: 2, dash: [10])) // 線のスタイルを指定
+            .frame(width: 2, height: barHeight) // 線の幅を指定
+            .offset(x: (valueBounds.lowerBound - dispBounds.lowerBound) / dispBoundDiff * dispValueWidth + thumbSize,
+                    y: middleThumbPos )
+            .foregroundColor(Color.red.opacity(0.8)) // 線の色を指定
+        }
+        if dispBounds.lowerBound < valueBounds.lowerBound {
+          VerticalLine()
+            .stroke(style: StrokeStyle(lineWidth: 2, dash: [10])) // 線のスタイルを指定
+            .frame(width: 2, height: barHeight) // 線の幅を指定
+            .offset(x: (valueBounds.upperBound - dispBounds.lowerBound) / dispBoundDiff * dispValueWidth + marginL + thumbSize +  thumbSize / 2,
+                    y: middleThumbPos )
+            .foregroundColor(Color.red.opacity(0.8)) // 線の色を指定
+        }
+
+//        if dispBounds.lowerBound < valueBounds.lowerBound {
+//          Capsule()
+//            .fill(Color(UIColor.black.withAlphaComponent(0.7)))
+//            .offset(x: marginL, y: middleThumbPos)
+//            .frame(width: (valueBounds.lowerBound - dispBounds.lowerBound) / dispBoundDiff * dispValueWidth + thumbSize , height: barHeight)
+//        }
+//        if dispBounds.upperBound > valueBounds.upperBound {
+//          Capsule()
+//            .fill(Color(UIColor.black.withAlphaComponent(0.7)))
+//            .offset(x:  (valueBounds.upperBound - dispBounds.lowerBound) / dispBoundDiff * dispValueWidth + marginL + thumbSize, y: middleThumbPos)
+//            .frame(width: (dispBounds.upperBound - valueBounds.upperBound) / dispBoundDiff * dispValueWidth + thumbSize , height: barHeight)
+//        }
+
         Circle()
           .fill(Color(UIColor.white))
-          .shadow(color: Color(UIColor.gray), radius: 10)
+          .shadow(color: Color(UIColor.gray), radius: 3)
 //          .opacity(0.8)
           //            .border(Color.white, width: 5)
           .frame(width: thumbSize, height: thumbSize)
           //            .background(Circle().stroke(Color.white, lineWidth: 5))
           .overlay(
             Text(String(format: lowValueFormat, lowValue))
-              .font(.caption)
+              .font(.system(.subheadline, design: .rounded))
               .frame(width: 100)
               .offset(y: -28)
           )
@@ -104,7 +144,7 @@ struct RangeSlider: View {
               }
               guard let lowValueDragStart = lowValueDragStart else { return }
 
-              let dragValue = lowValueDragStart + (Double(value.translation.width / valueWidth) * dispBoundDiff)
+              let dragValue = lowValueDragStart + (Double(value.translation.width / dispValueWidth) * dispBoundDiff)
                 .rounded(toStep: step)
 
               if (dragValue + step) > highValue, (dragValue + step) <= valueBounds.upperBound {
@@ -128,12 +168,12 @@ struct RangeSlider: View {
 
         Circle()
           .fill(Color(UIColor.white))
-          .shadow(color: Color(UIColor.gray), radius: 10)
+          .shadow(color: Color(UIColor.gray), radius: 3)
 //          .opacity(0.8)
           .frame(width: thumbSize, height: thumbSize)
           .overlay(
             Text(String(format: highValueFormat, highValue))
-              .font(.caption)
+              .font(.system(.subheadline, design: .rounded))
               .frame(width: 100)
               .offset(y: -28)
           )
@@ -145,7 +185,7 @@ struct RangeSlider: View {
               }
               guard let highValueDragStart = highValueDragStart else { return }
 
-              let dragValue = highValueDragStart + (Double(value.translation.width / valueWidth) * dispBoundDiff)
+              let dragValue = highValueDragStart + (Double(value.translation.width / dispValueWidth) * dispBoundDiff)
                 .rounded(toStep: step)
               if (dragValue - step) < lowValue, (dragValue - step) >= valueBounds.lowerBound {
                 lowValue = (dragValue - step).clamped(to: valueBounds.lowerBound...(highValue + step))
@@ -170,98 +210,23 @@ struct RangeSlider: View {
   }
 
   var body: some View {
-//    ZStack(alignment: Alignment(horizontal: .leading, vertical: .center)) {
-
     VStack {
       Spacer()
-      //          let maxX = geometry.size.width + marginL + marginR
-//        let dispBoundLen = dispBounds.upperBound - dispBounds.lowerBound
-//        let lowThumbPos = minX + CGFloat(self.lowValue / dispBoundLen * sliderWidth - thumbSize / 2.0)
-//        let highThumbPos = minX + CGFloat(self.highValue / dispBoundLen * sliderWidth - thumbSize / 2.0)
-//        let middleThumbPos = thumbSize / 2.0 - barHeight / 2.0
-
-      HStack { //
+      HStack {
         Text(String(format: minFormat, dispBounds.lowerBound))
-          .font(.caption)
+          .font(.system(.subheadline, design: .rounded))
           .foregroundColor(Color(uiColor: UIColor.label))
           .frame(width: 32)
-//          .border(Color.red)
 
         slider
-//          .border(Color.red)
 
         Text(String(format: maxFormat, dispBounds.upperBound))
-          .font(.caption)
+          .font(.system(.subheadline, design: .rounded))
           .foregroundColor(Color(uiColor: UIColor.label))
-//              .frame(width: 32)
-//          .border(Color.red)
-
-        //        .offset( y: middleThumbPos)
       }
 
       Spacer()
 
-//      Text(String(format: "%.2f %.2f", barsize.width, barsize.height))
-//        .font(.caption)
-//        .foregroundColor(Color(uiColor: UIColor.label))
-//        .frame(width: 32)
-//        .border(Color.red)
-
-//      ZStack
-//      {
-//        Capsule()
-//          .fill(Color(UIColor.systemBlue))
-//          .offset(x: lowThumbPos, y: middleThumbPos)
-//          //            .offset(x: CGFloat(self.minValue))
-//          .frame(width: highThumbPos - lowThumbPos, height: 4)
-//
-//        Circle()
-//          .fill(Color(UIColor.white))
-//          .shadow(color: Color(UIColor.gray), radius: 10)
-      ////            .opacity(0.8)
-//          //            .border(Color.white, width: 5)
-//          .frame(width: thumbSize, height: thumbSize)
-//          //            .background(Circle().stroke(Color.white, lineWidth: 5))
-//          .overlay(
-//            Text(String(format: format, lowValue))
-//              .border(Color.red)
-//              .font(.caption)
-//              .frame(width: 100)
-//              .offset(y: -28)
-//
-//          )
-//          .offset(x: lowThumbPos)
-//          .gesture(DragGesture(minimumDistance: 1.0)
-//            .onChanged { value in
-//              let dragValue = Double((value.location.x - minX) / sliderWidth) * dispBoundLen
-//
-//              lowValue = dragValue.clamped(to: valueBounds.lowerBound...(highValue-step))
-//              print("gesture drag : loc=\(String(format: "%.2f", value.location.x)) drag=\(String(format: "%.2f", dragValue)) lowValue=\(String(format: "%.2f", lowValue)) highValue=\(String(format: "%.2f", highValue))")
-//            })
-//
-//        Circle()
-//          .fill(Color(UIColor.white))
-//          .shadow(color: Color(UIColor.gray), radius: 10)
-      ////            .opacity(0.8)
-//          .frame(width: thumbSize, height: thumbSize)
-//          .overlay(
-//            Text(String(format: format, highValue))
-//              .font(.caption)
-//              .frame(width: 100)
-//              .offset(y: -28)
-//          )
-//          .offset(x: highThumbPos)
-//          .gesture(DragGesture(minimumDistance: 1.0)
-//            .onChanged { value in
-//              let dragValue = Double((value.location.x - minX) / sliderWidth) * dispBoundLen
-//
-//              highValue = min(max(dragValue,lowValue + step ) , valueBounds.upperBound )
-      ////
-      ////              dragValue
-      ////                .clamped(to: (lowValue + step)...valueBounds.upperBound)
-//              print("gesture drag : loc=\(String(format: "%.2f", value.location.x)) drag=\(String(format: "%.2f", dragValue)) lowValue=\(String(format: "%.2f", lowValue)) highValue=\(String(format: "%.2f", highValue))")
-//            })
-//      }
     }.padding(.horizontal, 6)
   }
 }
@@ -269,7 +234,7 @@ struct RangeSlider: View {
 struct RangeSliderExample: View {
   @State private var sliderValue: ClosedRange<Double> = 0...100
 
-  @State private var lowerValue: Double = 10
+  @State private var lowerValue: Double = 20
   @State private var upperValue: Double = 80
 
   @State private var position = CGSize.zero
@@ -278,7 +243,7 @@ struct RangeSliderExample: View {
     VStack {
 //      RangeSliderCircle(value: $sliderValue, bounds: 0...100)
       RangeSlider(lowValue: $lowerValue, highValue: $upperValue,
-                  valueBounds: 0...100, dispBounds: 0...100)
+                  valueBounds: 10...90, dispBounds: 0...100)
 
       Circle()
         .stroke(Color.blue, lineWidth: 2)
