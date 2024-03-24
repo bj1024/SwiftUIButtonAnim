@@ -9,6 +9,7 @@ import UIKit
 
 class UIRippleView: UIView {
   var isShow: Bool = true
+  var strokeWidth:ClosedRange<Double> = 1...2
   var circleColors: [UIColor] = [UIColor.blue]
   var numberOfCircles: Int = 5
   var duration: Double = 2.0
@@ -77,8 +78,7 @@ class UIRippleView: UIView {
       }
 
       shapeLayer.strokeColor = strokeCGColor
-
-      shapeLayer.lineWidth = 2
+      shapeLayer.lineWidth = Double.random(in: strokeWidth)
       shapeLayer.fillColor = UIColor.clear.cgColor
       shapeLayer.opacity = 0
 
