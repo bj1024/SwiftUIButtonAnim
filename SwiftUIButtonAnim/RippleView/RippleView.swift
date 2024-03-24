@@ -36,6 +36,7 @@ struct RippleView: UIViewRepresentable {
     uiView.interval = interval
     uiView.positionDiff = positionDiff
     uiView.lineWidthRange = lineWidthRange
+    uiView.delay = delay
     uiView.circleColors = colors.map{
       UIColor($0)
     }
