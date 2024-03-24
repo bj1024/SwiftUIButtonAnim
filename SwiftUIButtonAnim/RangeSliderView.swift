@@ -4,222 +4,281 @@
 //
 
 import SwiftUI
-
+import UIKit
 extension Double {
   // 値を特定の範囲に制限（クランプ）する
   func clamped(to limits: ClosedRange<Double>) -> Double {
     return min(max(self, limits.lowerBound), limits.upperBound)
   }
+
+  func rounded(toStep step: Double) -> Double {
+    let divisor = self / step
+    return divisor.rounded(.towardZero) * step
+  }
 }
 
-//
-// struct DoubleThumbSlider: View {
-//    @Binding var lowerValue: Double
-//    @Binding var upperValue: Double
-//    var bounds: ClosedRange<Double>
-//
-//    var body: some View {
-//        GeometryReader { geometry in
-//            ZStack {
-//                Color.gray.opacity(0.3)
-//                    .frame(height: 3)
-//                Color.blue
-//                    .frame(width: CGFloat(upperValue - lowerValue) * geometry.size.width, height: 3)
-//                    .offset(x: CGFloat(lowerValue) * geometry.size.width)
-//                Circle()
-//                    .frame(width: 20, height: 20)
-//                    .foregroundColor(.white)
-//                    .shadow(radius: 5)
-//                    .offset(x: CGFloat(lowerValue) * geometry.size.width)
-//                    .gesture(DragGesture().onChanged { value in
-//                        lowerValue = Double(value.location.x / geometry.size.width).clamped(to: bounds.lowerBound...min(upperValue, bounds.upperBound))
-//                    })
-//                Circle()
-//                    .frame(width: 20, height: 20)
-//                    .foregroundColor(.white)
-//                    .shadow(radius: 5)
-//                    .offset(x: CGFloat(upperValue) * geometry.size.width)
-//                    .gesture(DragGesture().onChanged { value in
-//                        upperValue = Double(value.location.x / geometry.size.width).clamped(to: max(lowerValue, bounds.lowerBound)...bounds.upperBound)
-//                    })
-//            }
-//        }
-//        .padding(.horizontal)
-//    }
-// }
+struct SizePreferenceKey: PreferenceKey {
+  static var defaultValue: CGSize = .zero
+  static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
+    value = nextValue()
+  }
+}
 
 struct RangeSlider: View {
-  @State private var lowValue: Double = 5.0
-  @State private var highValue: Double = 90.0
-  @State private var step: Double = 1.0
+  @Binding var lowValue: Double
+  @Binding var highValue: Double
+  @State var step: Double = 1
+  @State var maxFormat: String = "%.0f"
+  @State var minFormat: String = "%.0f"
+
+  @State var lowValueFormat: String = "%.0f"
+  @State var highValueFormat: String = "%.0f"
   var valueBounds: ClosedRange<Double>
   var dispBounds: ClosedRange<Double>
 
-  private let thumbSize: Double = 24.0
-  private let marginL = 32.0
-  private let marginR = 32.0
+  @State private var barsize: CGSize = .zero
+
+  private let thumbSize: Double = 16.0
+
+  private let marginL = 8.0
+  private let marginR = 8.0
   private let barHeight = 4.0
-  var body: some View {
-   
-    ZStack(alignment: Alignment(horizontal: .leading, vertical: .center)) {
+
+  @State private var lowValueDragStart: Double?
+  @State private var lowValueDragPrev: Double?
+  @State private var highValueDragStart: Double?
+  @State private var highValueDragPrev: Double?
+
+  func playHapticFeedback(_ style: UIImpactFeedbackGenerator.FeedbackStyle) {
+    let generator = UIImpactFeedbackGenerator(style: style)
+    generator.impactOccurred()
+  }
+
+  var slider: some View {
+    ZStack {
       GeometryReader { geometry in
         let sliderWidth = geometry.size.width - marginL - marginR
-        let minX = marginL
-    //          let maxX = geometry.size.width + marginL + marginR
-        let dispBoundLen = dispBounds.upperBound - dispBounds.lowerBound
-        let lowThumbPos = minX + CGFloat(self.lowValue / dispBoundLen * sliderWidth - thumbSize / 2.0)
-        let highThumbPos = minX + CGFloat(self.highValue / dispBoundLen * sliderWidth - thumbSize / 2.0)
+        // 値は左側つまみの右端から右側つまみの左端を使う
+        let valueWidth = sliderWidth - thumbSize * 2
+        let dispBoundDiff = dispBounds.upperBound - dispBounds.lowerBound
+
+        // つまみの右端
+        let lowValuePos = marginL + thumbSize + CGFloat(self.lowValue / dispBoundDiff * valueWidth)
+        // つまみの左端
+        let highValuePos = marginL + thumbSize + CGFloat(self.highValue / dispBoundDiff * valueWidth)
+
         let middleThumbPos = thumbSize / 2.0 - barHeight / 2.0
-
-
-        HStack { //
-          Text(String(format: "%.0f", dispBounds.lowerBound))
-            .font(.caption)
-            .foregroundColor(Color(uiColor: UIColor.label))
-            
-          Spacer()
-
-          Text(String(format: "%.0f", dispBounds.upperBound))
-            .font(.caption)
-            .foregroundColor(Color(uiColor: UIColor.label))
-        }
-//        .offset( y: middleThumbPos)
 
         Capsule()
           .fill(Color(UIColor.systemGray))
-          .offset(x: minX, y: middleThumbPos)
-          .frame(width: sliderWidth, height: 4)
+          .frame(width: sliderWidth, height: barHeight)
+          .offset(x: marginL, y: middleThumbPos)
+        //            .offset(x: CGFloat(self.minValue))
 
         Capsule()
           .fill(Color(UIColor.systemBlue))
-          .offset(x: lowThumbPos, y: middleThumbPos)
+          .offset(x: lowValuePos, y: middleThumbPos)
           //            .offset(x: CGFloat(self.minValue))
-          .frame(width: highThumbPos - lowThumbPos, height: 4)
+          .frame(width: highValuePos - lowValuePos, height: barHeight)
 
         Circle()
           .fill(Color(UIColor.white))
           .shadow(color: Color(UIColor.gray), radius: 10)
-//            .opacity(0.8)
+//          .opacity(0.8)
           //            .border(Color.white, width: 5)
           .frame(width: thumbSize, height: thumbSize)
           //            .background(Circle().stroke(Color.white, lineWidth: 5))
           .overlay(
-            Text(String(format: "%.0f", lowValue))
+            Text(String(format: lowValueFormat, lowValue))
               .font(.caption)
+              .frame(width: 100)
               .offset(y: -28)
           )
-          .offset(x: lowThumbPos)
+
+          .offset(x: lowValuePos - thumbSize)
           .gesture(DragGesture(minimumDistance: 1.0)
             .onChanged { value in
-              let dragValue = Double((value.location.x - minX) / sliderWidth) * dispBoundLen
-              lowValue = dragValue.clamped(to: valueBounds.lowerBound...highValue)
-              print("gesture drag : loc=\(String(format: "%.2f", value.location.x)) drag=\(String(format: "%.2f", dragValue)) lowValue=\(String(format: "%.2f", lowValue))")
-            })
+
+              if lowValueDragStart == nil {
+                lowValueDragStart = lowValue
+              }
+              guard let lowValueDragStart = lowValueDragStart else { return }
+
+              let dragValue = lowValueDragStart + (Double(value.translation.width / valueWidth) * dispBoundDiff)
+                .rounded(toStep: step)
+
+              if (dragValue + step) > highValue, (dragValue + step) <= valueBounds.upperBound {
+                print("set High")
+                highValue = (dragValue + step).clamped(to: lowValue + step...(valueBounds.upperBound))
+              }
+              lowValue = dragValue.clamped(to: valueBounds.lowerBound...(highValue - step))
+
+              print("gesture drag: lowValueDragStart=\(String(format: "%.2f", lowValueDragStart)) st=\(String(format: "%.2f", value.startLocation.x)) loc=\(String(format: "%.2f", value.location.x)) translation=\(String(format: "%.2f", value.translation.width))  drag=\(String(format: "%.2f", dragValue)) lowValue=\(String(format: "%.2f", lowValue)) highValue=\(String(format: "%.2f", highValue))")
+
+              if lowValueDragPrev == nil || lowValueDragPrev != lowValue {
+                playHapticFeedback(.light)
+              }
+              lowValueDragPrev = lowValue
+            }
+            .onEnded { _ in
+              lowValueDragStart = nil
+              lowValueDragPrev = nil
+            }
+          )
 
         Circle()
           .fill(Color(UIColor.white))
           .shadow(color: Color(UIColor.gray), radius: 10)
-//            .opacity(0.8)
+//          .opacity(0.8)
           .frame(width: thumbSize, height: thumbSize)
           .overlay(
-            Text(String(format: "%.0f", highValue))
+            Text(String(format: highValueFormat, highValue))
               .font(.caption)
+              .frame(width: 100)
               .offset(y: -28)
           )
-          .offset(x: highThumbPos)
+          .offset(x: highValuePos)
           .gesture(DragGesture(minimumDistance: 1.0)
             .onChanged { value in
-              let dragValue = Double((value.location.x - minX) / sliderWidth) * dispBoundLen
-              highValue = dragValue.clamped(to: lowValue...valueBounds.upperBound)
-              print("gesture drag : loc=\(String(format: "%.2f", value.location.x)) drag=\(String(format: "%.2f", dragValue)) highValue=\(String(format: "%.2f", highValue))")
-            })
-      }
-    }.padding(.horizontal, 6)
-  }
-}
+              if highValueDragStart == nil {
+                highValueDragStart = highValue
+              }
+              guard let highValueDragStart = highValueDragStart else { return }
 
-struct RangeSliderCircle: View {
-  @State var minValue: Double = 0.0
-  @State var maxValue: Double = .init(UIScreen.main.bounds.width - 50.0)
+              let dragValue = highValueDragStart + (Double(value.translation.width / valueWidth) * dispBoundDiff)
+                .rounded(toStep: step)
+              if (dragValue - step) < lowValue, (dragValue - step) >= valueBounds.lowerBound {
+                lowValue = (dragValue - step).clamped(to: valueBounds.lowerBound...(highValue + step))
+              }
+
+              highValue = min(max(dragValue, lowValue + step), valueBounds.upperBound)
+              print("gesture drag : loc=\(String(format: "%.2f", value.location.x)) drag=\(String(format: "%.2f", dragValue)) lowValue=\(String(format: "%.2f", lowValue)) highValue=\(String(format: "%.2f", highValue))")
+
+              if highValueDragPrev == nil || highValueDragPrev != highValue {
+                playHapticFeedback(.light)
+              }
+              highValueDragPrev = highValue
+            }
+            .onEnded { _ in
+              highValueDragStart = nil
+              highValueDragPrev = nil
+            }
+          )
+      }
+    }
+    .frame(height: thumbSize)
+  }
 
   var body: some View {
-    // setup slider view
+//    ZStack(alignment: Alignment(horizontal: .leading, vertical: .center)) {
+
     VStack {
-      HStack {
-        Text("0")
-          .offset(x: 28, y: 20)
-          .frame(width: 30, height: 30, alignment: .leading)
-          .foregroundColor(Color.black)
+      Spacer()
+      //          let maxX = geometry.size.width + marginL + marginR
+//        let dispBoundLen = dispBounds.upperBound - dispBounds.lowerBound
+//        let lowThumbPos = minX + CGFloat(self.lowValue / dispBoundLen * sliderWidth - thumbSize / 2.0)
+//        let highThumbPos = minX + CGFloat(self.highValue / dispBoundLen * sliderWidth - thumbSize / 2.0)
+//        let middleThumbPos = thumbSize / 2.0 - barHeight / 2.0
 
-        Spacer()
+      HStack { //
+        Text(String(format: minFormat, dispBounds.lowerBound))
+          .font(.caption)
+          .foregroundColor(Color(uiColor: UIColor.label))
+          .frame(width: 32)
+//          .border(Color.red)
 
-        Text("100")
-          .offset(x: -18, y: 20)
-          .frame(width: 30, height: 30, alignment: .trailing)
-          .foregroundColor(Color.black)
+        slider
+//          .border(Color.red)
+
+        Text(String(format: maxFormat, dispBounds.upperBound))
+          .font(.caption)
+          .foregroundColor(Color(uiColor: UIColor.label))
+//              .frame(width: 32)
+//          .border(Color.red)
+
+        //        .offset( y: middleThumbPos)
       }
 
-      ZStack(alignment: Alignment(horizontal: .leading, vertical: .center), content: {
-        Capsule()
-          .fill(Color.black.opacity(25))
-          .frame(width: CGFloat((UIScreen.main.bounds.width - 50) + 10), height: 30)
+      Spacer()
 
-        Capsule()
-          .fill(Color.black.opacity(25))
-          .offset(x: CGFloat(self.minValue))
-          .frame(width: CGFloat((self.maxValue) - self.minValue), height: 30)
+//      Text(String(format: "%.2f %.2f", barsize.width, barsize.height))
+//        .font(.caption)
+//        .foregroundColor(Color(uiColor: UIColor.label))
+//        .frame(width: 32)
+//        .border(Color.red)
 
-        Circle()
-          .fill(Color.orange)
-          .frame(width: 30, height: 30)
-          .background(Circle().stroke(Color.white, lineWidth: 5))
-          .offset(x: CGFloat(self.minValue))
-          .gesture(DragGesture().onChanged { value in
-            if value.location.x > 8, value.location.x <= (UIScreen.main.bounds.width - 50),
-               value.location.x < CGFloat(self.maxValue - 30)
-            {
-              self.minValue = Double(value.location.x - 8)
-            }
-          })
-
-        Text(String(format: "%.0f", (CGFloat(self.minValue) / (UIScreen.main.bounds.width - 50)) * 100))
-          .offset(x: CGFloat(self.minValue))
-          .frame(width: 30, height: 30, alignment: .center)
-          .foregroundColor(Color.black)
-
-        Circle()
-          .fill(Color.orange)
-          .frame(width: 30, height: 30)
-          .background(Circle().stroke(Color.white, lineWidth: 5))
-          .offset(x: CGFloat(self.maxValue - 18))
-          .gesture(DragGesture().onChanged { value in
-            if value.location.x - 8 <= (UIScreen.main.bounds.width - 50), value.location.x > CGFloat(self.minValue + 50) {
-              self.maxValue = Double(value.location.x - 8)
-            }
-          })
-
-        Text(String(format: "%.0f", (CGFloat(self.maxValue) / (UIScreen.main.bounds.width - 50)) * 100))
-          .offset(x: CGFloat(self.maxValue - 18))
-          .frame(width: 30, height: 30, alignment: .center)
-          .foregroundColor(Color.black)
-      })
-      .padding()
-    }
+//      ZStack
+//      {
+//        Capsule()
+//          .fill(Color(UIColor.systemBlue))
+//          .offset(x: lowThumbPos, y: middleThumbPos)
+//          //            .offset(x: CGFloat(self.minValue))
+//          .frame(width: highThumbPos - lowThumbPos, height: 4)
+//
+//        Circle()
+//          .fill(Color(UIColor.white))
+//          .shadow(color: Color(UIColor.gray), radius: 10)
+      ////            .opacity(0.8)
+//          //            .border(Color.white, width: 5)
+//          .frame(width: thumbSize, height: thumbSize)
+//          //            .background(Circle().stroke(Color.white, lineWidth: 5))
+//          .overlay(
+//            Text(String(format: format, lowValue))
+//              .border(Color.red)
+//              .font(.caption)
+//              .frame(width: 100)
+//              .offset(y: -28)
+//
+//          )
+//          .offset(x: lowThumbPos)
+//          .gesture(DragGesture(minimumDistance: 1.0)
+//            .onChanged { value in
+//              let dragValue = Double((value.location.x - minX) / sliderWidth) * dispBoundLen
+//
+//              lowValue = dragValue.clamped(to: valueBounds.lowerBound...(highValue-step))
+//              print("gesture drag : loc=\(String(format: "%.2f", value.location.x)) drag=\(String(format: "%.2f", dragValue)) lowValue=\(String(format: "%.2f", lowValue)) highValue=\(String(format: "%.2f", highValue))")
+//            })
+//
+//        Circle()
+//          .fill(Color(UIColor.white))
+//          .shadow(color: Color(UIColor.gray), radius: 10)
+      ////            .opacity(0.8)
+//          .frame(width: thumbSize, height: thumbSize)
+//          .overlay(
+//            Text(String(format: format, highValue))
+//              .font(.caption)
+//              .frame(width: 100)
+//              .offset(y: -28)
+//          )
+//          .offset(x: highThumbPos)
+//          .gesture(DragGesture(minimumDistance: 1.0)
+//            .onChanged { value in
+//              let dragValue = Double((value.location.x - minX) / sliderWidth) * dispBoundLen
+//
+//              highValue = min(max(dragValue,lowValue + step ) , valueBounds.upperBound )
+      ////
+      ////              dragValue
+      ////                .clamped(to: (lowValue + step)...valueBounds.upperBound)
+//              print("gesture drag : loc=\(String(format: "%.2f", value.location.x)) drag=\(String(format: "%.2f", dragValue)) lowValue=\(String(format: "%.2f", lowValue)) highValue=\(String(format: "%.2f", highValue))")
+//            })
+//      }
+    }.padding(.horizontal, 6)
   }
 }
 
 struct RangeSliderExample: View {
   @State private var sliderValue: ClosedRange<Double> = 0...100
 
-  @State private var lowerValue: Double = 0.2
-  @State private var upperValue: Double = 0.8
+  @State private var lowerValue: Double = 10
+  @State private var upperValue: Double = 80
 
   @State private var position = CGSize.zero
 
   var body: some View {
     VStack {
 //      RangeSliderCircle(value: $sliderValue, bounds: 0...100)
-      RangeSlider(valueBounds: 5...90, dispBounds: 0...100)
+      RangeSlider(lowValue: $lowerValue, highValue: $upperValue,
+                  valueBounds: 0...100, dispBounds: 0...100)
 
       Circle()
         .stroke(Color.blue, lineWidth: 2)

@@ -10,7 +10,8 @@ struct SwiftUIButtonAnimApp: App {
     var body: some Scene {
         WindowGroup {
 //            ContentView()
-          RippleSample()
+//          RippleSample()
+          RangeSliderExample()
         }
     }
 }
