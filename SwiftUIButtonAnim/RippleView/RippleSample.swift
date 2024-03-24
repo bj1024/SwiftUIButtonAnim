@@ -55,6 +55,8 @@ struct RippleSample: View {
   @State var interval: Double = 3.0
   @State var numberOfCircles: Int = 10
   @State var positionDiff: Double = 2
+  @State var lineWidthMin:Double = 1
+  @State var lineWidthMax:Double = 2
 
   var intProxy: Binding<Double> {
     Binding<Double>(get: {
@@ -78,10 +80,10 @@ struct RippleSample: View {
   var body: some View {
     VStack {
       ZStack {
-        Image("medium")
-          .resizable()
-          .aspectRatio(contentMode: .fit)
-          .frame(width: 300, height: 300)
+//        Image("medium")
+//          .resizable()
+//          .aspectRatio(contentMode: .fit)
+//          .frame(width: 300, height: 300)
        
         RippleView(isShow: isShow,
                    numberOfCircles: numberOfCircles,
@@ -89,9 +91,11 @@ struct RippleSample: View {
                    duration: duration,
                    delay: delay,
                    interval: interval,
-                   positionDiff: positionDiff)
+                   positionDiff: positionDiff,
+                   lineWidthRange: lineWidthMin...lineWidthMax
+        )
           .frame(width: rippleWidth, height: rippleHeight)
-          .blendMode(.colorDodge)
+//          .blendMode(.colorDodge)
 
         Button(action: {
           isShow.toggle()
@@ -122,6 +126,7 @@ struct RippleSample: View {
 
           Slider(value: $rippleWidth, in: 0.0 ... 300.0, step: 10.0)
           Slider(value: $rippleHeight, in: 0.0 ... 300.0, step: 10.0)
+          
         }
         VStack {
           Text("numberOfCircles=\(numberOfCircles)")
@@ -148,6 +153,12 @@ struct RippleSample: View {
         VStack {
           Text("positionDiff=\(String(format: "%0.1f", positionDiff))")
           Slider(value: $positionDiff, in: 0.0 ... 50.0, step: 1.0)
+        }
+
+        VStack{
+          Text("w\(String(format: "%0.1f %0.1f", lineWidthMin,lineWidthMax))")
+
+          RangeSlider(lowValue: $lineWidthMin, highValue: $lineWidthMax, valueBounds: 1...20, dispBounds: 0...20)
         }
       }
       .listStyle(.inset)

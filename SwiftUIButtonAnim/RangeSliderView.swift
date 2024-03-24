@@ -99,7 +99,7 @@ struct RangeSlider: View {
                     y: middleThumbPos )
             .foregroundColor(Color.red.opacity(0.8)) // 線の色を指定
         }
-        if dispBounds.lowerBound < valueBounds.lowerBound {
+        if  valueBounds.upperBound  < dispBounds.upperBound {
           VerticalLine()
             .stroke(style: StrokeStyle(lineWidth: 2, dash: [10])) // 線のスタイルを指定
             .frame(width: 2, height: barHeight) // 線の幅を指定
@@ -243,7 +243,7 @@ struct RangeSliderExample: View {
     VStack {
 //      RangeSliderCircle(value: $sliderValue, bounds: 0...100)
       RangeSlider(lowValue: $lowerValue, highValue: $upperValue,
-                  valueBounds: 10...90, dispBounds: 0...100)
+                  valueBounds: 10...80, dispBounds: 0...100)
 
       Circle()
         .stroke(Color.blue, lineWidth: 2)

@@ -15,6 +15,8 @@ struct RippleView: UIViewRepresentable {
   var delay: Double
   var interval: Double = 0.5
   var positionDiff: Double
+  var lineWidthRange:ClosedRange<Double> = 1...2
+
 
   func makeUIView(context: Context) -> UIRippleView {
     let view = UIRippleView()
@@ -33,6 +35,7 @@ struct RippleView: UIViewRepresentable {
     uiView.duration = duration
     uiView.interval = interval
     uiView.positionDiff = positionDiff
+    uiView.lineWidthRange = lineWidthRange
     uiView.circleColors = colors.map{
       UIColor($0)
     }
