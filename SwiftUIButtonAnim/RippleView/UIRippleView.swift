@@ -11,7 +11,7 @@ class UIRippleView: UIView {
   var isShow: Bool = true
   var lineWidthRange: ClosedRange<Double> = 1...2
   var circleColors: [UIColor] = [UIColor.blue]
-  var numberOfCircles: Int = 5
+  var numberOfCircles: Int = 1
   var duration: Double = 2.0
   var delay: Double = 0.5
   var interval: Double = 0.5
@@ -55,7 +55,7 @@ class UIRippleView: UIView {
     let circleNum = max(numberOfCircles - currentCircleNum, 0)
 
     let currentMediaTime = CACurrentMediaTime()
-//    print("currentCircleNum = \(currentCircleNum),   circleNum = \(circleNum)")
+    print("currentCircleNum = \(currentCircleNum),   circleNum = \(circleNum)")
     // Create circle layers
     for i in 0 ..< circleNum {
 //      print(" insrt i = \(i)")
