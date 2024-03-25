@@ -71,14 +71,16 @@ struct RippleSample: View {
   //  let endColor = Color(#colorLiteral(red: 0.05724914705, green: 0, blue: 1, alpha: 0.7992931548))
   @State var endColor = Color(#colorLiteral(red: 0.04023407099, green: 0.2384221714, blue: 0.5562983247, alpha: 0.8))
   @State var duration: Double = 3.0
-  @State var delay: Double = 0.2
+  @State var delay: Double = 0.5
   @State var interval: Double = 0.0
-  @State var numberOfCircles: Int = 1
-  @State var positionDiff: Double = 4
+  @State var numberOfCircles: Int = 5
+  @State var positionDiff: Double = 10
   @State var lineWidthMin: Double = 1
-  @State var lineWidthMax: Double = 5
+  @State var lineWidthMax: Double = 10
 
   @State private var keepAspect: Bool = true
+
+  @State private var isAnimating: Bool = false
 
   var intProxy: Binding<Double> {
     Binding<Double>(get: {
@@ -138,6 +140,16 @@ struct RippleSample: View {
     [Color.purple.opacity(0.1), Color.white.opacity(0.1)],
     [Color.pink.opacity(0.1), Color.white.opacity(0.1)],
 
+    [Color.white.opacity(1.0), Color.white.opacity(1.0)],
+    [Color.red.opacity(1.0), Color.white.opacity(1.0)],
+    [Color.green.opacity(1.0), Color.white.opacity(1.0)],
+    [Color.blue.opacity(1.0), Color.white.opacity(1.0)],
+    [Color.black.opacity(1.0), Color.white.opacity(1.0)],
+    [Color.yellow.opacity(1.0), Color.white.opacity(1.0)],
+    [Color.orange.opacity(1.0), Color.white.opacity(1.0)],
+    [Color.teal.opacity(1.0), Color.white.opacity(1.0)],
+    [Color.purple.opacity(1.0), Color.white.opacity(1.0)],
+    [Color.pink.opacity(1.0), Color.white.opacity(1.0)],
   ]
 
   init() {}
@@ -145,12 +157,30 @@ struct RippleSample: View {
   var body: some View {
     VStack {
       ZStack {
-        Image("medium")
+//        ForEach(0..<1,id: \.self) { index in
+//          Image("medium")
+//            .resizable()
+//            .aspectRatio(contentMode: .fit)
+//            .frame(width: 300, height: 300)
+//          //          .saturation(0)
+//            .zIndex(3.0)
+//            .opacity(1)
+//            .blendMode(.colorDodge)
+//        }
+//        Rectangle()
+//          LinearGradient(gradient: Gradient(colors: [startColor,endColor]),
+//                                            startPoint: .leading, endPoint: .trailing)
+//          .frame(width: rippleWidth, height: rippleHeight)
+//          .zIndex(4.0)
+//          .opacity(0.9)
+//          .blendMode(.colorDodge)
+
+        Image("marbles")
           .resizable()
           .aspectRatio(contentMode: .fit)
-          .frame(width: 300, height: 300)
+          .frame(width: .infinity, height: 300)
           .zIndex(1.0)
-//          .blendMode(.colorDodge)
+//        
         RippleView(isShow: isShow,
                    numberOfCircles: numberOfCircles,
                    colors: createGradientColors(from: startColor, to: endColor, withCount: numberOfCircles),
@@ -160,8 +190,39 @@ struct RippleSample: View {
                    positionDiff: positionDiff,
                    lineWidthRange: lineWidthMin ... lineWidthMax)
           .frame(width: rippleWidth, height: rippleHeight)
-//          .blendMode(.colorDodge)
+          .blendMode(.colorDodge)
           .zIndex(2.0)
+
+        Image("marbles")
+          .resizable()
+          .aspectRatio(contentMode: .fit)
+          .frame(width: .infinity, height: 300)
+//          .blendMode(isAnimating ? .colorDodge : .normal)
+          .saturation(0)
+          .blendMode(.colorDodge)
+          .opacity(isAnimating ? 0.8 : 0)
+          .zIndex(3.0)
+          .animation(
+            .easeInOut(duration: 5.0)
+            .repeatForever(autoreverses: true),
+                     value: isAnimating)
+          .onAppear(){
+            isAnimating = true
+          }
+//
+
+        Capsule()
+          .fill(Color(UIColor.systemGray))
+          .frame(width: 60, height: 30)
+          .zIndex(20.0)
+          .shadow(radius: 30)
+          .blendMode(.colorDodge)
+          .opacity(isAnimating ? 1.0 : 0)
+          .animation(
+            .easeInOut(duration: 5.0)
+            .repeatForever(autoreverses: true),
+                     value: isAnimating)
+        
 
         Button(action: {
           isShow.toggle()
@@ -173,7 +234,8 @@ struct RippleSample: View {
             .background(isShow ? Color.red : Color.blue)
             .cornerRadius(40)
         }
-        .zIndex(3.0)
+        .zIndex(20.0)
+
       }
       .frame(maxWidth: .infinity)
       .background(Color(uiColor: UIColor.systemBackground))
