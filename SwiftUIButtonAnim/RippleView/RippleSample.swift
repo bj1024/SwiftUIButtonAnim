@@ -78,16 +78,13 @@ struct RippleSample: View {
   @State var lineWidthMin: Double = 1
   @State var lineWidthMax: Double = 10
 
-  
   @State var isImageLightShow = false
-  @State var imageSatuation:Double = 1.0
-  @State var imageBlur:Double = 1.0
-  
+  @State var imageSatuation: Double = 1.0
+  @State var imageBlur: Double = 1.0
+
   @State private var keepAspect: Bool = true
   @State private var isAnimating: Bool = false
 
-  
-  
   var intProxy: Binding<Double> {
     Binding<Double>(get: {
       // returns the score as a Double
@@ -158,6 +155,15 @@ struct RippleSample: View {
     [Color.pink.opacity(1.0), Color.white.opacity(1.0)],
   ]
 
+  enum Images: String, CaseIterable, Identifiable {
+    case marbles, ball, bird
+    var id: Self { self }
+  }
+
+  @State private var selectedImage: Images = .ball
+
+  private let starColor = Color(#colorLiteral(red: 0.9254902005, green: 0.2352941185, blue: 0.1019607857, alpha: 1)).opacity(0.8)
+  private let starColor2 = Color(#colorLiteral(red: 0.3098039329, green: 0.01568627544, blue: 0.1294117719, alpha: 1)).opacity(0.6)
   init() {}
 
   var body: some View {
@@ -182,30 +188,42 @@ struct RippleSample: View {
           //          .opacity(0.9)
           //          .blendMode(.colorDodge)
 
-          Image("marbles")
+          Image(selectedImage.rawValue)
             .resizable()
             .aspectRatio(contentMode: .fit)
             .frame(width: .infinity, height: 300)
             .saturation(imageSatuation)
             .blur(radius: (1 - imageBlur) * 20)
           if isImageLightShow {
-            Image("marbles")
+            Image(selectedImage.rawValue)
               .resizable()
               .aspectRatio(contentMode: .fit)
               .frame(width: .infinity, height: 300)
-            //          .blendMode(isAnimating ? .colorDodge : .normal)
-//              .saturation(0)
+              .saturation(imageSatuation)
               .blendMode(.colorDodge)
-              .opacity(isAnimating ? 0.9 : 0)
+              .opacity(isAnimating ? 0.8 : 0)
               .zIndex(3.0)
               .animation(
                 .easeInOut(duration: 5.0)
-                .repeatForever(autoreverses: true),
+                  .repeatForever(autoreverses: true),
                 value: isAnimating
               )
               .onAppear {
                 isAnimating = true
               }
+          }
+          if selectedImage == .ball {
+            Image(systemName: "star.fill")
+              .foregroundColor(
+                isAnimating ? starColor2 : starColor
+              )
+              .animation(
+                .easeInOut(duration: 5.0)
+                  .repeatForever(autoreverses: true),
+                value: isAnimating
+              )
+              .font(.system(size: 10))
+              .offset(x: -65, y: -35)
           }
         }
         .drawingGroup()
@@ -259,10 +277,10 @@ struct RippleSample: View {
 //      Spacer()
 //      List {
 //        Section {
-////          ListLabelText(label: "Show", value: isShow.description)
-////            .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8))
-////            .listRowSeparator(.visible, edges: .all)
-////          //
+      ////          ListLabelText(label: "Show", value: isShow.description)
+      ////            .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 8))
+      ////            .listRowSeparator(.visible, edges: .all)
+      ////          //
 //
 //          VStack(alignment:.leading, spacing: 0){
 //            Divider()
@@ -275,17 +293,15 @@ struct RippleSample: View {
 //        }
 //        .listSectionSeparator(.hidden)
 //      }
-////      .listStyle(.grouped)
+      ////      .listStyle(.grouped)
 //      .listStyle(.inset)
-
 
 //      Divider()
 //        .background(Color.red)
 //        .padding(0)
 
 //      @State var imageSatuation:Double = 1.0
-      
-      
+
       List {
         Section(header: Text("Image")) {
           HStack {
@@ -295,10 +311,10 @@ struct RippleSample: View {
             Toggle("", isOn: $isImageLightShow)
               .controlSize(.mini)
           }
-          
+
           VStack {
             HStack {
-              ListLabelText(label: "Sat", value: String(format:"%0.2f",imageSatuation))
+              ListLabelText(label: "Sat", value: String(format: "%0.2f", imageSatuation))
                 .frame(width: 100, alignment: .leading)
               Slider(value: $imageSatuation, in: 0.0 ... 1.0, step: 0.01)
             }
@@ -306,17 +322,25 @@ struct RippleSample: View {
 
           VStack {
             HStack {
-              ListLabelText(label: "Blur", value: String(format:"%0.2f",imageBlur))
+              ListLabelText(label: "Blur", value: String(format: "%0.2f", imageBlur))
                 .frame(width: 100, alignment: .leading)
               Slider(value: $imageBlur, in: 0.0 ... 1.0, step: 0.01)
             }
           }
+
+          Picker("Image", selection: $selectedImage) {
+            ForEach(Images.allCases) { images in
+              Text(images.rawValue.capitalized)
+                .tag(images.rawValue.capitalized)
+            }
+          }
         }
+
         Section(header: Text("Ripple")) {
           HStack {
             ListLabelText(label: "Show", value: isShow.description)
               .listRowSeparator(.visible, edges: .all)
- 
+
             Spacer()
             ZStack {
               RippleView(isShow: isShow,
