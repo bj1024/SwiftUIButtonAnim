@@ -42,6 +42,15 @@ func createGradientColors(from startColor: Color, to endColor: Color, withCount 
 // 使用例
 let gradientColors = createGradientColors(from: Color.red, to: Color.blue, withCount: 5)
 
+struct ListLabelText: View {
+  var label: String
+  var value: String
+  var body: some View {
+    Text("\(label):\(value)")
+      .font(.system(.body, design: .rounded))
+  }
+}
+
 struct RippleSample: View {
   @State var rippleWidth = 200.0
   @State var rippleHeight = 200.0
@@ -51,11 +60,14 @@ struct RippleSample: View {
   //  let endColor = Color(#colorLiteral(red: 0.05724914705, green: 0, blue: 1, alpha: 0.7992931548))
   @State var endColor = Color(#colorLiteral(red: 0.04023407099, green: 0.2384221714, blue: 0.5562983247, alpha: 0.8))
   @State var duration: Double = 3.0
-  @State var delay: Double = 0.5
-  @State var interval: Double = 3.0
+  @State var delay: Double = 0.2
+  @State var interval: Double = 0.0
   @State var numberOfCircles: Int = 10
-  @State var positionDiff: Double = 2
+  @State var positionDiff: Double = 4
+  @State var lineWidthMin: Double = 1
+  @State var lineWidthMax: Double = 5
 
+  @State private var keepAspect: Bool = true
   var intProxy: Binding<Double> {
     Binding<Double>(get: {
       // returns the score as a Double
@@ -69,12 +81,6 @@ struct RippleSample: View {
 
   init() {}
 
-  var startColorItem: some View {
-    VStack {
-      ColorPicker("startColor", selection: $startColor)
-    }
-  }
-
   var body: some View {
     VStack {
       ZStack {
@@ -82,14 +88,15 @@ struct RippleSample: View {
           .resizable()
           .aspectRatio(contentMode: .fit)
           .frame(width: 300, height: 300)
-       
+
         RippleView(isShow: isShow,
                    numberOfCircles: numberOfCircles,
                    colors: createGradientColors(from: startColor, to: endColor, withCount: numberOfCircles),
                    duration: duration,
                    delay: delay,
                    interval: interval,
-                   positionDiff: positionDiff)
+                   positionDiff: positionDiff,
+                   lineWidthRange: lineWidthMin ... lineWidthMax)
           .frame(width: rippleWidth, height: rippleHeight)
           .blendMode(.colorDodge)
 
@@ -105,50 +112,115 @@ struct RippleSample: View {
         }
       }
       .background(Color(uiColor: UIColor.systemBackground))
-      .clipped()
-      .border(Color.red)
-      
-      
+//      .clipped()
+//      .border(Color.red)
+
       Spacer()
       List {
-        Text("isShow=\(isShow)")
-
-        startColorItem
-
-        ColorPicker("endColor", selection: $endColor)
+        ListLabelText(label: "Show", value: isShow.description)
+          .padding(0)
+          .listRowSeparator(.visible, edges: .all)
 
         VStack {
-          Text("size=\(String(format: "%0.0f,%0.0f", rippleWidth, rippleHeight))")
+          HStack {
+            ListLabelText(label: "Color", value: "")
+Spacer()
+            ColorPicker("Start", selection: $startColor, supportsOpacity: true)
+              .labelsHidden()
 
-          Slider(value: $rippleWidth, in: 0.0 ... 300.0, step: 10.0)
-          Slider(value: $rippleHeight, in: 0.0 ... 300.0, step: 10.0)
+            ColorPicker("End", selection: $endColor, supportsOpacity: true)
+              .labelsHidden()
+          }
         }
         VStack {
-          Text("numberOfCircles=\(numberOfCircles)")
-          Slider(value: intProxy, in: 0.0 ... 300.0, step: 1.0)
-          
-        }
-        .padding(10)
-      
-        VStack {
-          Text("duration=\(String(format: "%0.1f", duration))")
+          HStack {
+            ListLabelText(label: "Size", value: String(format: "%0.0fx%0.0f", rippleWidth, rippleHeight))
+            Spacer()
 
-          Slider(value: $duration, in: 0.0 ... 10.0, step: 0.1)
+            Toggle("Keep Aspect", isOn: $keepAspect)
+          }
+          HStack {
+            Slider(value: $rippleWidth, in: 0.0 ... 300.0, step: 10.0)
+              .onChange(of: rippleWidth) { _ in
+                if keepAspect {
+                  rippleHeight = rippleWidth
+                }
+              }
+            Slider(value: $rippleHeight, in: 0.0 ... 300.0, step: 10.0)
+              .onChange(of: rippleHeight) { _ in
+                if keepAspect {
+                  rippleWidth = rippleHeight
+                }
+              }
+          }
         }
-        VStack {
-          Text("delay=\(String(format: "%0.1f", delay))")
-          Slider(value: $delay, in: 0.0 ... 10.0, step: 0.1)
-        }
+        .padding(0)
+        .listRowSeparator(.visible, edges: .all)
 
         VStack {
-          Text("interval=\(String(format: "%0.1f", interval))")
-          Slider(value: $interval, in: 0.0 ... 10.0, step: 0.1)
+          HStack {
+            ListLabelText(label: "Num", value: "\(numberOfCircles)")
+              .frame(width: 100, alignment: .leading)
+            Slider(value: intProxy, in: 0.0 ... 300.0, step: 1.0)
+          }
         }
+        .padding(0)
+        .listRowSeparator(.visible, edges: .all)
 
         VStack {
-          Text("positionDiff=\(String(format: "%0.1f", positionDiff))")
-          Slider(value: $positionDiff, in: 0.0 ... 50.0, step: 1.0)
+          HStack {
+            //          Text("duration=\(String(format: "%0.1f", duration))")
+            ListLabelText(label: "Duration", value: "\(String(format: "%0.1f", duration))")
+              .frame(width: 100, alignment: .leading)
+            Slider(value: $duration, in: 0.0 ... 10.0, step: 0.1)
+          }
         }
+        .padding(0)
+        .listRowSeparator(.visible, edges: .all)
+
+        VStack {
+          HStack {
+            ListLabelText(label: "Delay", value: "\(String(format: "%0.1f", delay))")
+              .frame(width: 100, alignment: .leading)
+            Slider(value: $delay, in: 0.0 ... 10.0, step: 0.1)
+          }
+        }
+        .padding(0)
+        .listRowSeparator(.visible, edges: .all)
+
+        VStack {
+          HStack {
+            ListLabelText(label: "Interval", value: "\(String(format: "%0.1f", interval))")
+              .frame(width: 100, alignment: .leading)
+            Slider(value: $interval, in: 0.0 ... 10.0, step: 0.1)
+          }
+        }
+        .padding(0)
+        .listRowSeparator(.visible, edges: .all)
+
+        VStack {
+          HStack {
+            ListLabelText(label: "PosDiff", value: "\(String(format: "%0.1f", interval))")
+              .frame(width: 100, alignment: .leading)
+            Slider(value: $positionDiff, in: 0.0 ... 50.0, step: 1.0)
+          }
+        }
+        .padding(0)
+        .listRowSeparator(.visible, edges: .all)
+
+        VStack {
+          HStack {
+            ListLabelText(label: "Line Width", value: "\(String(format: "%0.0f-%0.0f", lineWidthMin, lineWidthMax))")
+              .padding(0)
+            RangeSlider(lowValue: $lineWidthMin,
+                        highValue: $lineWidthMax,
+                        valueBounds: 1 ... 20,
+                        dispBounds: 0 ... 20,
+                        isShowMinMaxLabel: false)
+          }
+        }
+        .padding(0)
+        .listRowSeparator(.visible, edges: .all)
       }
       .listStyle(.inset)
       .padding(8)

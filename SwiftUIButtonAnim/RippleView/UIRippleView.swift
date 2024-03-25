@@ -9,7 +9,7 @@ import UIKit
 
 class UIRippleView: UIView {
   var isShow: Bool = true
-  var strokeWidth:ClosedRange<Double> = 1...2
+  var lineWidthRange: ClosedRange<Double> = 1...2
   var circleColors: [UIColor] = [UIColor.blue]
   var numberOfCircles: Int = 5
   var duration: Double = 2.0
@@ -54,15 +54,15 @@ class UIRippleView: UIView {
 //    print("currentCircleNum = \(currentCircleNum),   numberOfCircles = \(numberOfCircles)")
     let circleNum = max(numberOfCircles - currentCircleNum, 0)
 
-    let currentMediaTime  = CACurrentMediaTime()
+    let currentMediaTime = CACurrentMediaTime()
 //    print("currentCircleNum = \(currentCircleNum),   circleNum = \(circleNum)")
     // Create circle layers
     for i in 0 ..< circleNum {
 //      print(" insrt i = \(i)")
       let shapeLayer = CAShapeLayer()
       let shapePath = UIBezierPath(
-        ovalIn: CGRect(origin: CGPoint(x: -1.0 * bounds.midX,
-                                       y: -1.0 * bounds.midY), size: bounds.size))
+        ovalIn: CGRect(origin: CGPoint(x: 0,
+                                       y: 0), size: CGSize.zero))
 
       shapeLayer.position = CGPoint(x: bounds.midX + Double.random(in: -positionDiff...positionDiff),
                                     y: bounds.midY + Double.random(in: -positionDiff...positionDiff))
@@ -78,25 +78,42 @@ class UIRippleView: UIView {
       }
 
       shapeLayer.strokeColor = strokeCGColor
-      shapeLayer.lineWidth = Double.random(in: strokeWidth)
+
+      ///      shapeLayer.lineWidth = Double.random(in: lineWidthRange)
+      let lineWidth = Double.random(in: lineWidthRange).rounded(.toNearestOrAwayFromZero)
+//      print("lineWidth=\(lineWidth)")
+      shapeLayer.lineWidth = lineWidth
       shapeLayer.fillColor = UIColor.clear.cgColor
       shapeLayer.opacity = 0
 
-      let animation1 = CABasicAnimation(keyPath: "transform.scale")
-      animation1.fromValue = 0
-      animation1.toValue = 1.0
+//      let animation1 = CABasicAnimation(keyPath: "transform.scale")
+//      animation1.fromValue = 0
+//      animation1.toValue = 1.0
+      let animation1 = CABasicAnimation(keyPath: "path")
+      let shapePath2 = UIBezierPath(
+        ovalIn: CGRect(origin: CGPoint(x: -1.0 * bounds.midX,
+                                       y: -1.0 * bounds.midY),
+                       size: bounds.size))
+
+//      animation1.fromValue = shapePath.cgPath
+      animation1.toValue = shapePath2.cgPath
 
       let animation2 = CABasicAnimation(keyPath: "opacity")
       animation2.fromValue = 1.0
       animation2.toValue = 0.0
+
+      let animation3 = CABasicAnimation(keyPath: "lineWidth")
+      animation3.toValue = 1.0
 
       let animGroup = CAAnimationGroup()
       animGroup.repeatCount = 1
       animGroup.isRemovedOnCompletion = false
 
       animGroup.duration = duration
+//      print("[\(i)]=\(delay * Double(i + 1))")
       animGroup.beginTime = currentMediaTime + delay * Double(i + 1)
       animGroup.animations = [animation1, animation2]
+//      animGroup.animations = [animation1, animation2, animation3]
 
       animGroup.setValue("ripple", forKey: "animId")
       animGroup.setValue(shapeLayer, forKey: "parentLayer")

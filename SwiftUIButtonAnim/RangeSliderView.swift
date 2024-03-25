@@ -37,16 +37,14 @@ struct VerticalLine: Shape {
 struct RangeSlider: View {
   @Binding var lowValue: Double
   @Binding var highValue: Double
-  @State var step: Double = 1
-  @State var maxFormat: String = "%.0f"
-  @State var minFormat: String = "%.0f"
-
-  @State var lowValueFormat: String = "%.0f"
-  @State var highValueFormat: String = "%.0f"
   var valueBounds: ClosedRange<Double>
   var dispBounds: ClosedRange<Double>
-
-  @State private var barsize: CGSize = .zero
+  var step: Double = 1
+  var maxFormat: String = "%.0f"
+  var minFormat: String = "%.0f"
+  var lowValueFormat: String = "%.0f"
+  var highValueFormat: String = "%.0f"
+  var isShowMinMaxLabel: Bool = true
 
   private let thumbSize: Double = 16.0
 
@@ -54,6 +52,7 @@ struct RangeSlider: View {
   private let marginR = 8.0
   private let barHeight = 6.0
 
+  @State private var barsize: CGSize = .zero
   @State private var lowValueDragStart: Double?
   @State private var lowValueDragPrev: Double?
   @State private var highValueDragStart: Double?
@@ -96,15 +95,15 @@ struct RangeSlider: View {
             .stroke(style: StrokeStyle(lineWidth: 2, dash: [10])) // 線のスタイルを指定
             .frame(width: 2, height: barHeight) // 線の幅を指定
             .offset(x: (valueBounds.lowerBound - dispBounds.lowerBound) / dispBoundDiff * dispValueWidth + thumbSize,
-                    y: middleThumbPos )
+                    y: middleThumbPos)
             .foregroundColor(Color.red.opacity(0.8)) // 線の色を指定
         }
-        if dispBounds.lowerBound < valueBounds.lowerBound {
+        if valueBounds.upperBound < dispBounds.upperBound {
           VerticalLine()
             .stroke(style: StrokeStyle(lineWidth: 2, dash: [10])) // 線のスタイルを指定
             .frame(width: 2, height: barHeight) // 線の幅を指定
-            .offset(x: (valueBounds.upperBound - dispBounds.lowerBound) / dispBoundDiff * dispValueWidth + marginL + thumbSize +  thumbSize / 2,
-                    y: middleThumbPos )
+            .offset(x: (valueBounds.upperBound - dispBounds.lowerBound) / dispBoundDiff * dispValueWidth + marginL + thumbSize + thumbSize / 2,
+                    y: middleThumbPos)
             .foregroundColor(Color.red.opacity(0.8)) // 線の色を指定
         }
 
@@ -132,7 +131,7 @@ struct RangeSlider: View {
             Text(String(format: lowValueFormat, lowValue))
               .font(.system(.subheadline, design: .rounded))
               .frame(width: 100)
-              .offset(y: -28)
+              .offset(y: -1.0 * thumbSize / 2 - 16.0)
           )
 
           .offset(x: lowValuePos - thumbSize)
@@ -175,7 +174,7 @@ struct RangeSlider: View {
             Text(String(format: highValueFormat, highValue))
               .font(.system(.subheadline, design: .rounded))
               .frame(width: 100)
-              .offset(y: -28)
+              .offset(y: -1.0 * thumbSize / 2 - 16.0)
           )
           .offset(x: highValuePos)
           .gesture(DragGesture(minimumDistance: 1.0)
@@ -213,21 +212,29 @@ struct RangeSlider: View {
     VStack {
       Spacer()
       HStack {
-        Text(String(format: minFormat, dispBounds.lowerBound))
-          .font(.system(.subheadline, design: .rounded))
-          .foregroundColor(Color(uiColor: UIColor.label))
-          .frame(width: 32)
-
+        if isShowMinMaxLabel {
+          Text(String(format: minFormat, dispBounds.lowerBound))
+            .font(.system(.subheadline, design: .rounded))
+            .foregroundColor(Color(uiColor: UIColor.label))
+            .frame(width: 32)
+        }
         slider
 
-        Text(String(format: maxFormat, dispBounds.upperBound))
-          .font(.system(.subheadline, design: .rounded))
-          .foregroundColor(Color(uiColor: UIColor.label))
+        if isShowMinMaxLabel {
+          Text(String(format: maxFormat, dispBounds.upperBound))
+            .font(.system(.subheadline, design: .rounded))
+            .foregroundColor(Color(uiColor: UIColor.label))
+        }
       }
+      .padding(.top, 32)
+      .padding(.bottom, 8)
+//      .frame(height: 60)
 
+//      .border(Color.red)
       Spacer()
 
     }.padding(.horizontal, 6)
+//      .border(Color.red)
   }
 }
 
@@ -242,8 +249,13 @@ struct RangeSliderExample: View {
   var body: some View {
     VStack {
 //      RangeSliderCircle(value: $sliderValue, bounds: 0...100)
-      RangeSlider(lowValue: $lowerValue, highValue: $upperValue,
-                  valueBounds: 10...90, dispBounds: 0...100)
+      RangeSlider(
+        lowValue: $lowerValue, 
+        highValue: $upperValue,
+        valueBounds: 10...80,
+        dispBounds: 0...100,
+        isShowMinMaxLabel: false
+      )
 
       Circle()
         .stroke(Color.blue, lineWidth: 2)
