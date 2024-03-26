@@ -219,3 +219,4 @@ fastlane/test_output
 
 
 ignore/
+project.xcconfig
