@@ -1,0 +1,7 @@
+// Configuration settings file format documentation can be found at:
+// https://help.apple.com/xcode/#/dev745c5c974
+CURRENT_PROJECT_VERSION=1
+
+DEVELOPMENT_TEAM = REPLACE_ME
+
+PRODUCT_BUNDLE_IDENTIFIER = REPLACE_ME

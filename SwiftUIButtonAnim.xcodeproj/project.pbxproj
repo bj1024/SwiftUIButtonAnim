@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		20422AF52BA8249C0085B2B0 /* RippleSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20422AF42BA8249C0085B2B0 /* RippleSample.swift */; };
+		2054236D2BB2CD2E007F69F9 /* project.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 2054236C2BB2CD2E007F69F9 /* project.xcconfig */; };
 		2056844C2BABB91600E34789 /* UIRippleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2056844B2BABB91600E34789 /* UIRippleView.swift */; };
 		2056844E2BABBA3C00E34789 /* RippleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2056844D2BABBA3C00E34789 /* RippleView.swift */; };
 		206001CC2BB1868300E311A5 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206001CB2BB1868300E311A5 /* MainMenu.swift */; };
@@ -42,6 +43,7 @@
 
 /* Begin PBXFileReference section */
 		20422AF42BA8249C0085B2B0 /* RippleSample.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RippleSample.swift; sourceTree = "<group>"; };
+		2054236C2BB2CD2E007F69F9 /* project.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = project.xcconfig; sourceTree = "<group>"; };
 		2056844B2BABB91600E34789 /* UIRippleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIRippleView.swift; sourceTree = "<group>"; };
 		2056844D2BABBA3C00E34789 /* RippleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RippleView.swift; sourceTree = "<group>"; };
 		206001CB2BB1868300E311A5 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 		20F940F52BA566090059342B = {
 			isa = PBXGroup;
 			children = (
+				2054236C2BB2CD2E007F69F9 /* project.xcconfig */,
 				20E948732BAEDDAE003A933F /* ListItem.swift */,
 				20F941002BA566090059342B /* SwiftUIButtonAnim */,
 				20F941112BA5660A0059342B /* SwiftUIButtonAnimTests */,
@@ -263,6 +266,7 @@
 			files = (
 				20F941092BA5660A0059342B /* Preview Assets.xcassets in Resources */,
 				20F941062BA5660A0059342B /* Assets.xcassets in Resources */,
+				2054236D2BB2CD2E007F69F9 /* project.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -453,13 +457,13 @@
 		};
 		20F941232BA5660A0059342B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2054236C2BB2CD2E007F69F9 /* project.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftUIButtonAnim/Preview Content\"";
-				DEVELOPMENT_TEAM = MYTEAMID;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -473,7 +477,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.SwiftUIButtonAnim;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -483,13 +486,13 @@
 		};
 		20F941242BA5660A0059342B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2054236C2BB2CD2E007F69F9 /* project.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SwiftUIButtonAnim/Preview Content\"";
-				DEVELOPMENT_TEAM = MYTEAMID;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -503,7 +506,6 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.SwiftUIButtonAnim;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
