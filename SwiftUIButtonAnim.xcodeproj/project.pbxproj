@@ -12,6 +12,9 @@
 		2056844C2BABB91600E34789 /* UIRippleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2056844B2BABB91600E34789 /* UIRippleView.swift */; };
 		2056844E2BABBA3C00E34789 /* RippleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2056844D2BABBA3C00E34789 /* RippleView.swift */; };
 		206001CC2BB1868300E311A5 /* MainMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206001CB2BB1868300E311A5 /* MainMenu.swift */; };
+		206BA8CF2BB3E45F00D1B309 /* BlendSampleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206BA8CE2BB3E45F00D1B309 /* BlendSampleView.swift */; };
+		206BA8D12BB3E48300D1B309 /* BlendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206BA8D02BB3E48300D1B309 /* BlendView.swift */; };
+		206BA8D32BB3E4BD00D1B309 /* UIBlendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206BA8D22BB3E4BD00D1B309 /* UIBlendView.swift */; };
 		20A0F7772BAFD5E60071F1C4 /* RangeSliderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20A0F7762BAFD5E60071F1C4 /* RangeSliderView.swift */; };
 		20E948722BAED173003A933F /* ColorList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E948712BAED173003A933F /* ColorList.swift */; };
 		20E948742BAEDDAE003A933F /* ListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E948732BAEDDAE003A933F /* ListItem.swift */; };
@@ -47,6 +50,9 @@
 		2056844B2BABB91600E34789 /* UIRippleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIRippleView.swift; sourceTree = "<group>"; };
 		2056844D2BABBA3C00E34789 /* RippleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RippleView.swift; sourceTree = "<group>"; };
 		206001CB2BB1868300E311A5 /* MainMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenu.swift; sourceTree = "<group>"; };
+		206BA8CE2BB3E45F00D1B309 /* BlendSampleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlendSampleView.swift; sourceTree = "<group>"; };
+		206BA8D02BB3E48300D1B309 /* BlendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlendView.swift; sourceTree = "<group>"; };
+		206BA8D22BB3E4BD00D1B309 /* UIBlendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIBlendView.swift; sourceTree = "<group>"; };
 		20A0F7762BAFD5E60071F1C4 /* RangeSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeSliderView.swift; sourceTree = "<group>"; };
 		20E948712BAED173003A933F /* ColorList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorList.swift; sourceTree = "<group>"; };
 		20E948732BAEDDAE003A933F /* ListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListItem.swift; sourceTree = "<group>"; };
@@ -97,15 +103,24 @@
 			path = RippleView;
 			sourceTree = "<group>";
 		};
+		206BA8CD2BB3E43700D1B309 /* CALayerView */ = {
+			isa = PBXGroup;
+			children = (
+				206BA8CE2BB3E45F00D1B309 /* BlendSampleView.swift */,
+				206BA8D02BB3E48300D1B309 /* BlendView.swift */,
+				206BA8D22BB3E4BD00D1B309 /* UIBlendView.swift */,
+			);
+			path = CALayerView;
+			sourceTree = "<group>";
+		};
 		20F940F52BA566090059342B = {
 			isa = PBXGroup;
 			children = (
 				2054236C2BB2CD2E007F69F9 /* project.xcconfig */,
-				20E948732BAEDDAE003A933F /* ListItem.swift */,
+				20F940FF2BA566090059342B /* Products */,
 				20F941002BA566090059342B /* SwiftUIButtonAnim */,
 				20F941112BA5660A0059342B /* SwiftUIButtonAnimTests */,
 				20F9411B2BA5660A0059342B /* SwiftUIButtonAnimUITests */,
-				20F940FF2BA566090059342B /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -122,14 +137,16 @@
 		20F941002BA566090059342B /* SwiftUIButtonAnim */ = {
 			isa = PBXGroup;
 			children = (
-				20A0F7762BAFD5E60071F1C4 /* RangeSliderView.swift */,
-				2056844F2BABBA7500E34789 /* RippleView */,
-				20F941012BA566090059342B /* SwiftUIButtonAnimApp.swift */,
-				20F941032BA566090059342B /* ContentView.swift */,
-				20F941052BA5660A0059342B /* Assets.xcassets */,
-				20F941072BA5660A0059342B /* Preview Content */,
 				20E948712BAED173003A933F /* ColorList.swift */,
+				20F941032BA566090059342B /* ContentView.swift */,
+				20E948732BAEDDAE003A933F /* ListItem.swift */,
 				206001CB2BB1868300E311A5 /* MainMenu.swift */,
+				20A0F7762BAFD5E60071F1C4 /* RangeSliderView.swift */,
+				20F941012BA566090059342B /* SwiftUIButtonAnimApp.swift */,
+				20F941052BA5660A0059342B /* Assets.xcassets */,
+				206BA8CD2BB3E43700D1B309 /* CALayerView */,
+				20F941072BA5660A0059342B /* Preview Content */,
+				2056844F2BABBA7500E34789 /* RippleView */,
 			);
 			path = SwiftUIButtonAnim;
 			sourceTree = "<group>";
@@ -295,10 +312,13 @@
 				206001CC2BB1868300E311A5 /* MainMenu.swift in Sources */,
 				20E948742BAEDDAE003A933F /* ListItem.swift in Sources */,
 				2056844E2BABBA3C00E34789 /* RippleView.swift in Sources */,
+				206BA8CF2BB3E45F00D1B309 /* BlendSampleView.swift in Sources */,
 				20A0F7772BAFD5E60071F1C4 /* RangeSliderView.swift in Sources */,
+				206BA8D32BB3E4BD00D1B309 /* UIBlendView.swift in Sources */,
 				20422AF52BA8249C0085B2B0 /* RippleSample.swift in Sources */,
 				20F941042BA566090059342B /* ContentView.swift in Sources */,
 				2056844C2BABB91600E34789 /* UIRippleView.swift in Sources */,
+				206BA8D12BB3E48300D1B309 /* BlendView.swift in Sources */,
 				20F941022BA566090059342B /* SwiftUIButtonAnimApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

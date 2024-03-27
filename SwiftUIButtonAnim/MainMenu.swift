@@ -16,7 +16,9 @@ struct MainMenu: View {
     Item(name: "RippleSample",
          destination: AnyView(RippleSample())),
     Item(name: "RangeSlider", destination:
-      AnyView(RangeSliderExample()))
+      AnyView(RangeSliderExample())),
+    Item(name: "CALayerBlend", destination:
+      AnyView(BlendSampleView()))
   ]
 
   var body: some View {
